@@ -1,0 +1,14 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Hello ESA</h1>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io.connect();
+            socket.on('connection', function () {
+                console.log("Connected");
+            });
+        </script>
+    </body>
+</html>
