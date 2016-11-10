@@ -1,2 +1,2 @@
-require("babel-core").transform("code");
-require("./index.js");
+require("babel-core/register");
+require("./indexer.js");
