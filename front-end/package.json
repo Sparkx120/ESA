@@ -13,7 +13,10 @@
     "server": "node server | .\\node_modules\\.bin\\bunyan",
     "dev": "concurrently \"npm run watch\" \"npm run server\""
   },
-  "author": "James Wake <sparkx120@sparkx120.com> (http://sparkx120.com)",
+  "authors": [
+    "James Wake <jwake@uwo.ca>",
+    "Julien Zhu <tzhu43@uwo.ca>"
+  ],
   "license": "UNLICENSED",
   "repository": {
     "type": "git",

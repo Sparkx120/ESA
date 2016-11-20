@@ -1,9 +1,8 @@
 var path = require('path');
 var webpack = require('webpack');
-var ClosureCompilerPlugin = require('webpack-closure-compiler');
 
 module.exports = {
-  entry: './index.js',
+  entry: './react/index.jsx',
   output: { path: __dirname + '/www', filename: 'bundle.js' },
   module: {
     loaders: [
@@ -16,7 +15,7 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /node_modules/,
         query: {
-          presets: [ 'es2015', 'react']
+          presets: [ 'es2015', 'react' ]
         }
 			}
     ]
