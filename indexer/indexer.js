@@ -1,69 +1,107 @@
 // general modules
-import * as util from "./libs/util/util";
+import * as  util from "./libs/util/util";
 import {FileMetrics} from "./libs/util/metrics";
 
 // logging module
-import {logger} from "./libs/logging/logger";
+import logger from "./libs/logging/logger";
 
 // file system object representation
 import {FileSystemObject} from "./libs/fileutils/filesystemobject";
 
+// database module
+import Mongo from "./libs/mongo/mongo.js";
+const mongo = new Mongo();
+
 // command-line arguments
-import {root} from "./libs/args/args";
+import args from "./libs/args/args";
+const {root, server, port} = args;
 
 /* profiling tool */
-let profiler = new FileMetrics();
+const profiler = new FileMetrics();
 
-/* BFS-traversal queue */
-let queue = []; // keep elements as strings for easy serialization
+/* Add a single file system object to the database. */
+function addFSOToDatabase(col, parent, dirFso) {
+    // get the representation as an object
+    let asObj = dirFso.toObject();
 
-/* Dummy function to print out file names. */
-function doSomethingWithFiles(files) {
-    for (let f of files) {
-        logger.debug(f.fullpath);
-        profiler.filesIndexed++;
-    }
-}
+    // add the parent to the object
+    asObj.parent = parent;
 
-/* Dummy function to print out directory names. */
-function doSomethingWithDirectories(directories) {
-    for (let d of directories) {
-        logger.debug(d.fullpath);
-        profiler.directoriesIndexed++;
-    }
+    // send the object to the databse to add
+    mongo.addToCollection(asObj, col);
 }
 
 /* Begin the indexer. */
 function startIndexer(root) {
-    // start by enqueuing the root directory
+    // create the BFS-traversal queue
+    let queue = []; // keep elements as parent-name pairs
+
+    // establish the name of a new collection in the database for the indexing
+    let collectionName = new Date().toJSON();
+
+    // enqueue the root directory
     logger.info("Starting indexer from root: %s.", root);
-    queue.push(root);
+    queue.push({ parent: null, name: root });
 
     // continue indexing until our traversal queue is empty
     while (!util.isEmpty(queue)) {
-        // peek at the head of our queue to get the next directory to look at
+        // peek at the head of our queue to get the next object to look at
         let head = queue[0];
 
-        // separate files and directories in the directory
-        let s = FileSystemObject.splitIntoFilesAndDirectories(head);
-        let f = s.files;
-        let d = s.directories;
-        profiler.errors += s.errorCount;
+        // create a representation of the object
+        let ret = FileSystemObject.createFileSystemObject(head.name);
+        let fso = ret.fso;
+        profiler.unknownCount += ret.unknown;
 
-        // for now, do some dummy operation with the files and directories
-        doSomethingWithFiles(f);
-        doSomethingWithDirectories(d);
+        if (fso != null) {
+            // add the object to database
+            addFSOToDatabase(collectionName, head.parent, fso);
 
-        // enqueue all the directories
-        d.forEach(x => queue.push(x.fullpath));
+            // for each file in this directory...
+            if (!fso.isDirectory) {
+                // should only happen if root was a file; then, do nothing else
+                profiler.filesIndexed++;
+            } else if (fso.isSymLink) {
+                // if it's a symbolic link, then count it as a directory, but don't go into it
+                profiler.directoriesIndexed++;
+            } else {
+                // it was a directory
+                profiler.directoriesIndexed++;
+
+                // otherwise, for each file in the directory...
+                for (let f of fso.files) {
+                    // create the representation of the file
+                    let fileRet = FileSystemObject.createFileSystemObject(f);
+                    let fileFso = fileRet.fso;
+                    profiler.unknownCount += fileRet.unknown;
+
+                    // add the file to database
+                    if (fileFso != null) {
+                        addFSOToDatabase(collectionName, head.name, fileFso);
+                        profiler.filesIndexed++;
+                    }
+                }
+
+                // enqueue all the directories with their parent's name to the queue
+                for (let x of fso.folders) {
+                    queue.push({ parent: head.name, name: x });
+                }
+            }
+        }
 
         // dequeue the head element of the queue
         queue.shift();
+
+        // finish processing folder
+        logger.debug(`Processed ${head.name}.`);
     }
 
     logger.info("Indexing complete.");
 }
 
-startIndexer(root);
-
-profiler.logMetrics();
+/* connect to database and execute indexer */
+mongo.connectTo(server, port, "esa", () => {
+    startIndexer(root);
+    profiler.logMetrics();
+    mongo.close();
+});

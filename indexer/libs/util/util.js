@@ -3,4 +3,4 @@ function isEmpty(arr) {
     return typeof arr == "undefined" || arr == null || arr.length == 0;
 }
 
-export { isEmpty };
+export {isEmpty};

@@ -1,8 +1,8 @@
 // logging module
-import * as bunyan from "bunyan";
+import bunyan from "bunyan";
 
 // filesystem module
-import * as fs from "fs";
+import fs from "fs";
 
 // create log files
 if (!fs.existsSync("logs")) {
@@ -11,7 +11,7 @@ if (!fs.existsSync("logs")) {
 fs.closeSync(fs.openSync("logs/info.log", "w"));
 fs.closeSync(fs.openSync("logs/verbose.log", "w"));
 
-export let logger = bunyan.createLogger({
+export default bunyan.createLogger({
     name: "esa",
     streams: [
         {

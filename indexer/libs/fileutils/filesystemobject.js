@@ -1,73 +1,98 @@
 // filesystem modules
-import * as fs from "fs";
-import * as os from "os";
+import fs from "fs";
+import os from "os";
 
 // logging module
-import {logger} from "../logging/logger";
+import logger from "../logging/logger";
 
 export class FileSystemObject {
-    constructor(isDirectory, name, parent, fullpath, size, owner, group, lastModified, hostname) {
+    constructor(isDirectory, isSymLink, name, size, owner, group, lastModified, hostname) {
         this._isDirectory = isDirectory;
+        this._isSymLink = isSymLink;
         this._name = name;
-        this._parent = parent;
-        this._fullpath = fullpath;
         this._size = size;
         this._owner = owner;
         this._group = group;
         this._lastModified = lastModified;
         this._hostname = hostname;
+        this._files = [];
+        this._folders = [];
     }
 
     /* Returns a FileSystemObject representation of a file given its path. */
-    static createFileSystemObject(parent, filename) {
-        let fullpath = parent == null ? filename : `${parent}/${filename}`;
-        let stats = fs.statSync(fullpath);
-        return new FileSystemObject(stats.isDirectory(), filename, parent, fullpath, stats["size"], stats["uid"], stats["gid"], stats["mtime"].getTime(), os.hostname());
-    }
-
-    /* Given a pathname, separate the file system objects contained in it into files and directories. */
-    static splitIntoFilesAndDirectories(pathname) {
-        let files = [];
-        let directories = [];
-        let numErrors = 0;
+    static createFileSystemObject(filename) {
+        let unknown = 0;
 
         try {
-            // get the files contained with the directory
-            let contained = fs.readdirSync(pathname);
+            let stats = fs.lstatSync(filename);
 
-            for (let f of contained) {
+            if (stats.isDirectory()) {
+                // return representation for a directory
+                let fso = new FileSystemObject(true, false, filename, stats["size"], stats["uid"], stats["gid"], stats["mtime"].getTime(), os.hostname());
+
                 try {
-                    // create a file system object containing the details of the file
-                    let fso = FileSystemObject.createFileSystemObject(pathname, f);
+                    // get the files contained with the directory
+                    let contained = fs.readdirSync(filename);
 
-                    // separate file system objects into lists by whether they are a directory or not
-                    if (fso.isDirectory) {
-                        directories.push(fso);
-                    } else {
-                        files.push(fso);
+                    // separate contained files into by whether they are a directory or not
+                    for (let f of contained) {
+                        try {
+                            let fFullpath = `${filename}/${f}`;
+                            let fStats = fs.lstatSync(fFullpath);
+
+                            // add the files to the correct list
+                            if (fStats.isDirectory() || fStats.isSymbolicLink()) {
+                                fso.addFolder(fFullpath);
+                            } else {
+                                fso.addFile(fFullpath);
+                            }
+                        } catch (err) {
+                            unknown++;
+                            logger.error(err.toString());
+                        }
                     }
                 } catch (err) {
+                    unknown++;
                     logger.error(err.toString());
-                    numErrors++;
                 }
+
+                return { fso, unknown };
+            } else if (stats.isSymbolicLink()) {
+                // return representation for a symbolic link
+                return { fso: new FileSystemObject(true, true, filename, stats["size"], stats["uid"], stats["gid"], stats["mtime"].getTime(), os.hostname()), unknown };
+            } else {
+                // return representation for a file
+                return { fso: new FileSystemObject(false, false, filename, stats["size"], stats["uid"], stats["gid"], stats["mtime"].getTime(), os.hostname()), unknown };
             }
         } catch (err) {
+            unknown++;
             logger.error(err.toString());
-            numErrors++;
+            return { fso: null, unknown };
         }
+    }
 
-        return { files, directories, errorCount: numErrors };
+    /* Returns the file system object as a convenient JS object. */
+    toObject() {
+        return { "_id": this._name,
+            "isFolder": this._isDirectory,
+            "isSymLink": this._isSymLink,
+            "size": this._size,
+            "owner": this._owner,
+            "group": this._group,
+            "last-modified": this._lastModified,
+            "hostname": this._hostname,
+            "files": this.files,
+            "folders": this.folders
+        };
     }
 
     /* setters and getters */
     set isDirectory(isDirectory)    { this._isDirectory = isDirectory; }
     get isDirectory()               { return this._isDirectory; }
+    set isSymLink(isSymLink)        { this._isSymLink = isSymLink; }
+    get isSymLink()                 { return this._isSymLink; }
     set name(name)                  { this._name = name; }
     get name()                      { return this._name; }
-    set parent(parent)              { this._parent = parent; }
-    get parent()                    { return this._parent; }
-    set fullpath(fullpath)          { this._fullpath = fullpath; }
-    get fullpath()                  { return this._fullpath; }
     set size(size)                  { this._size = size; }
     get size()                      { return this._size; }
     set owner(owner)                { this._owner = owner; }
@@ -78,4 +103,16 @@ export class FileSystemObject {
     get lastModified()              { return this._lastModified; }
     set hostname(hostname)          { this._hostname = hostname; }
     get hostname()                  { return this._hostname; }
+    get files()                     { return (this._isDirectory ? this._files : null); }
+    get folders()                   { return (this._isDirectory ? this._folders : null); }
+
+    /* Adds a file name to the object's files array. */
+    addFile(filename) {
+        this._files.push(filename);
+    }
+
+    /* Adds a folder path to the object's folders array. */
+    addFolder(dirpath) {
+        this._folders.push(dirpath);
+    }
 }
