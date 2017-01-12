@@ -1,11 +1,25 @@
-// filesystem modules
+/** @module libs/fileutils/filesystemobject */
+
 import fs from "fs";
+import logger from "../logging/logger";
 import os from "os";
 
-// logging module
-import logger from "../logging/logger";
+/** Representation of a file system object. */
+export default class FileSystemObject {
 
-export class FileSystemObject {
+    /**
+     * Creates an instance of FileSystemObject.
+     * 
+     * @author Jonathan Tan
+     * @param {boolean} isDirectory - Whether the object is a directory.
+     * @param {boolean} isSymLink - Whether the object is a symbolic link.
+     * @param {string} name - The file name of the object.
+     * @param {number} size - The file size of the object.
+     * @param {number} owner - The owner ID of the object.
+     * @param {number} group - The group ID of the object.
+     * @param {Date} lastModified - The date the object was last modified.
+     * @param {string} hostname - The hostname of where the object is located.
+     */
     constructor(isDirectory, isSymLink, name, size, owner, group, lastModified, hostname) {
         this._isDirectory = isDirectory;
         this._isSymLink = isSymLink;
@@ -19,8 +33,33 @@ export class FileSystemObject {
         this._folders = [];
     }
 
-    /* Returns a FileSystemObject representation of a file given its path. */
+    /**
+     * A newly created {@link FileSystemObject}.
+     * 
+     * @author Jonathan Tan
+     * @typedef {Object} NewFileSystemObject
+     * @property {FileSystemObject} fso - The representation of the object.
+     * @property {number} unknown - The number of children files and directories unable to be read.
+     */
+
+    /**
+     * Returns a representation of a a file system object given its path.
+     * 
+     * @author Jonathan Tan
+     * @param {string} filename - The file name of the object.
+     * @returns {NewFileSystemObject} The representation of the object.
+     */
+
+    /**
+     * Returns a representation of a a file system object given its path.
+     * 
+     * @author Jonathan Tan
+     * @static
+     * @param {string} filename - The file name of the object.
+     * @returns {NewFileSystemObject} The representation of the object.
+     */
     static createFileSystemObject(filename) {
+        // children files and directories that were unable to be read
         let unknown = 0;
 
         try {
@@ -71,9 +110,31 @@ export class FileSystemObject {
         }
     }
 
-    /* Returns the file system object as a convenient JS object. */
+    /**
+     * An object representation of a {@link FileSystemObject}.
+     * 
+     * @typedef {Object} FileSystemObjectAsObject
+     * @property {string} _id - The file name of the object.
+     * @property {boolean} isDirectory - Whether the object is a directory.
+     * @property {boolean} isSymLink - Whether the object is a symbolic link.
+     * @property {number} size - The file size of the object.
+     * @property {number} owner - The owner ID of the object.
+     * @property {number} group - The group ID of the object.
+     * @property {Date} last-modified - The date the object was last modified.
+     * @property {string} hostname - The hostname of where the object is located.
+     * @property {string[]} files - The object's children files' names.
+     * @property {string[]} folders - The object's children directories's paths.
+     */
+
+    /**
+     * Returns the file system object as a convenient JavaScript object.
+     * 
+     * @author Jonathan Tan
+     * @returns {FileSystemObjectAsObject} The JS object representation of the {@link FileSystemObject}.
+     */
     toObject() {
-        return { "_id": this._name,
+        return {
+            "_id": this._name,
             "isFolder": this._isDirectory,
             "isSymLink": this._isSymLink,
             "size": this._size,
@@ -84,6 +145,26 @@ export class FileSystemObject {
             "files": this.files,
             "folders": this.folders
         };
+    }
+
+    /**
+     * Adds a file name to the object's files array.
+     * 
+     * @author Jonathan Tan
+     * @param {string} filename - The file name to add.
+     */
+    addFile(filename) {
+        this._files.push(filename);
+    }
+
+    /**
+     * Adds a folder path to the object's folders array.
+     * 
+     * @author Jonathan Tan
+     * @param {string} dirpath - The directory path to add.
+     */
+    addFolder(dirpath) {
+        this._folders.push(dirpath);
     }
 
     /* setters and getters */
@@ -105,14 +186,4 @@ export class FileSystemObject {
     get hostname()                  { return this._hostname; }
     get files()                     { return (this._isDirectory ? this._files : null); }
     get folders()                   { return (this._isDirectory ? this._folders : null); }
-
-    /* Adds a file name to the object's files array. */
-    addFile(filename) {
-        this._files.push(filename);
-    }
-
-    /* Adds a folder path to the object's folders array. */
-    addFolder(dirpath) {
-        this._folders.push(dirpath);
-    }
 }

@@ -9,11 +9,14 @@
   "author": "",
   "license": "ISC",
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   },
   "dependencies": {
     "bunyan": "^1.8.4",
     "mongodb": "^2.2.11",
+    "node-yaml-config": "0.0.4",
     "yargs": "^6.3.0"
   },
   "devDependencies": {

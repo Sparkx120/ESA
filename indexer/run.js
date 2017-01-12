@@ -1,2 +1,2 @@
-require("babel-core/register");
-require("./indexer.js");
+require("babel-register");
+require("./indexermaster.js");
