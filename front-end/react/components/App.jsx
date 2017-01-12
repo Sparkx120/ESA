@@ -6,6 +6,8 @@ import React from 'react';
  * @class App
  */
 export default class App extends React.Component {
+    componentDidMount(){
+    }
     render() {
         return(
             <div className="App">

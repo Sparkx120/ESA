@@ -1,3 +1,4 @@
 node_modules/
 logs/*.log
 *hot-update.*
+*bundle.js

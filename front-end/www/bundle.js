@@ -63,7 +63,7 @@
 /******/ 	}
 
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "b933fa7004e7db835301"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "dd3be4b53a584e979f5b"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 
@@ -27677,7 +27677,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  font-size: 1em;\n}\n\n.App {\n  width: 100vw;\n  height: 100vw;\n  margin: 0%;\n}\n\n.PageContainer {\n  width: 100vw;\n}\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQzpcXFVzZXJzXFxqYW1lc1xcR2l0SHViXFxlc2FcXGZyb250LWVuZFxccmVhY3RcXHN0eWxlc1xcc3R5bGUuc2NzcyIsInNvdXJjZXMiOlsiL1VzZXJzL2phbWVzL0dpdEh1Yi9lc2EvZnJvbnQtZW5kL3JlYWN0L3N0eWxlcy9zdHlsZS5zY3NzIl0sInNvdXJjZXNDb250ZW50IjpbIi8vQmFzZSBTdHlsZXNcclxuYm9keXtcclxuICAgIGZvbnQtc2l6ZTogMWVtXHJcbn1cclxuXHJcbi5BcHB7XHJcbiAgICB3aWR0aDoxMDB2dztcclxuICAgIGhlaWdodDoxMDB2dztcclxuICAgIG1hcmdpbjogMCU7XHJcbn1cclxuXHJcbi5QYWdlQ29udGFpbmVye1xyXG4gICAgd2lkdGg6MTAwdnc7XHJcbn0iXSwibWFwcGluZ3MiOiJBQUNBLEFBQUEsSUFBSSxDQUFBO0VBQ0EsU0FBUyxFQUFFLEdBQ2QsR0FBQzs7QUFFRixBQUFBLElBQUksQ0FBQTtFQUNBLEtBQUssRUFBQyxLQUFNO0VBQ1osTUFBTSxFQUFDLEtBQU07RUFDYixNQUFNLEVBQUUsRUFBRyxHQUNkOztBQUVELEFBQUEsY0FBYyxDQUFBO0VBQ1YsS0FBSyxFQUFDLEtBQU0sR0FDZiIsIm5hbWVzIjpbXX0= */", ""]);
+	exports.push([module.id, "body {\n  font-size: 1em;\n  margin: 0%;\n}\n\n.App {\n  width: 100vw;\n  height: 100vh;\n  margin: 0%;\n}\n\n.PageContainer {\n  width: 100vw;\n}\n\n.treemap-container {\n  position: relative;\n  width: 90%;\n  height: 90%;\n}\n\n.treeMap {\n  width: 90%;\n  height: 90%;\n}\n\n.node {\n  box-sizing: border-box;\n  position: absolute;\n  overflow: hidden;\n}\n\n.node-label {\n  padding: 4px;\n  line-height: 1em;\n}\n\n.node-value {\n  color: rgba(0, 0, 0, 0.8);\n  font-size: 9px;\n  margin-top: 1px;\n}\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiQzpcXFVzZXJzXFxqYW1lc1xcR2l0SHViXFxlc2FcXGZyb250LWVuZFxccmVhY3RcXHN0eWxlc1xcc3R5bGUuc2NzcyIsInNvdXJjZXMiOlsiL1VzZXJzL2phbWVzL0dpdEh1Yi9lc2EvZnJvbnQtZW5kL3JlYWN0L3N0eWxlcy9zdHlsZS5zY3NzIl0sInNvdXJjZXNDb250ZW50IjpbIi8vQmFzZSBTdHlsZXNcbmJvZHl7XG4gICAgZm9udC1zaXplOiAxZW07XG4gICAgbWFyZ2luOiAwJTtcbn1cblxuLkFwcHtcbiAgICB3aWR0aDoxMDB2dztcbiAgICBoZWlnaHQ6MTAwdmg7XG4gICAgbWFyZ2luOiAwJTtcbn1cblxuLlBhZ2VDb250YWluZXJ7XG4gICAgd2lkdGg6MTAwdnc7XG59XG5cbi50cmVlbWFwLWNvbnRhaW5lcntcbiAgICBwb3NpdGlvbjogcmVsYXRpdmU7XG4gICAgd2lkdGg6IDkwJTtcbiAgICBoZWlnaHQ6IDkwJTtcbn1cblxuLnRyZWVNYXB7XG4gICAgd2lkdGg6ICA5MCU7XG4gICAgaGVpZ2h0OiA5MCU7XG59XG5cbi5ub2Rle1xuICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG4gICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgIG92ZXJmbG93OiBoaWRkZW47XG59XG5cbi5ub2RlLWxhYmVse1xuICAgIHBhZGRpbmc6IDRweDtcbiAgICBsaW5lLWhlaWdodDogMWVtO1xuICAgIC8vIHdoaXRlLXNwYWNlOiBwcmU7XG59XG5cbi5ub2RlLXZhbHVle1xuICAgIGNvbG9yOiByZ2JhKDAsMCwwLDAuOCk7XG4gICAgZm9udC1zaXplOiA5cHg7XG4gICAgbWFyZ2luLXRvcDogMXB4O1xufSJdLCJtYXBwaW5ncyI6IkFBQ0EsQUFBQSxJQUFJLENBQUE7RUFDQSxTQUFTLEVBQUUsR0FBSTtFQUNmLE1BQU0sRUFBRSxFQUFHLEdBQ2Q7O0FBRUQsQUFBQSxJQUFJLENBQUE7RUFDQSxLQUFLLEVBQUMsS0FBTTtFQUNaLE1BQU0sRUFBQyxLQUFNO0VBQ2IsTUFBTSxFQUFFLEVBQUcsR0FDZDs7QUFFRCxBQUFBLGNBQWMsQ0FBQTtFQUNWLEtBQUssRUFBQyxLQUFNLEdBQ2Y7O0FBRUQsQUFBQSxrQkFBa0IsQ0FBQTtFQUNkLFFBQVEsRUFBRSxRQUFTO0VBQ25CLEtBQUssRUFBRSxHQUFJO0VBQ1gsTUFBTSxFQUFFLEdBQUksR0FDZjs7QUFFRCxBQUFBLFFBQVEsQ0FBQTtFQUNKLEtBQUssRUFBRyxHQUFJO0VBQ1osTUFBTSxFQUFFLEdBQUksR0FDZjs7QUFFRCxBQUFBLEtBQUssQ0FBQTtFQUNELFVBQVUsRUFBRSxVQUFXO0VBQ3ZCLFFBQVEsRUFBRSxRQUFTO0VBQ25CLFFBQVEsRUFBRSxNQUFPLEdBQ3BCOztBQUVELEFBQUEsV0FBVyxDQUFBO0VBQ1AsT0FBTyxFQUFFLEdBQUk7RUFDYixXQUFXLEVBQUUsR0FBSSxHQUVwQjs7QUFFRCxBQUFBLFdBQVcsQ0FBQTtFQUNQLEtBQUssRUFBRSxrQkFBSTtFQUNYLFNBQVMsRUFBRSxHQUFJO0VBQ2YsVUFBVSxFQUFFLEdBQUksR0FDbkIiLCJuYW1lcyI6W119 */", ""]);
 
 	// exports
 
@@ -28029,6 +28029,9 @@
 	    }
 
 	    _createClass(App, [{
+	        key: "componentDidMount",
+	        value: function componentDidMount() {}
+	    }, {
 	        key: "render",
 	        value: function render() {
 	            return _react2.default.createElement(
@@ -28065,6 +28068,12 @@
 
 	var _socket2 = _interopRequireDefault(_socket);
 
+	var _TreeMap = __webpack_require__(297);
+
+	var _TreeMap2 = _interopRequireDefault(_TreeMap);
+
+	var _testData = __webpack_require__(298);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28094,7 +28103,9 @@
 	        var _this = _possibleConstructorReturn(this, (_ref = Home.__proto__ || Object.getPrototypeOf(Home)).call.apply(_ref, [this].concat(args)));
 
 	        _this.state = {
-	            "home": ""
+	            "home": "",
+	            graphWidth: 960,
+	            graphHeight: 1060
 	        };
 	        return _this;
 	    }
@@ -28110,6 +28121,14 @@
 	                _this2.setState({ "home": data });
 	            });
 	            _socket2.default.emit("home");
+
+	            //Test for Graph rerender speed
+	            // this.interval = setInterval(()=>{
+	            //     let newHeight = this.state.graphHeight - 1;
+	            //     if(newHeight < 500) newHeight = 1060;
+	            //     this.setState({graphHeight: newHeight});
+
+	            // },20)
 	        }
 	        //React on Unmount
 
@@ -28117,6 +28136,7 @@
 	        key: 'componentWillUnmount',
 	        value: function componentWillUnmount() {
 	            _socket2.default.off("home");
+	            // clearInterval(this.interval);
 	        }
 	    }, {
 	        key: 'render',
@@ -28128,7 +28148,8 @@
 	                    'h1',
 	                    null,
 	                    this.state.home
-	                )
+	                ),
+	                _react2.default.createElement(_TreeMap2.default, { data: _testData.csvData, className: 'treeMap' })
 	            );
 	        }
 	    }]);
@@ -36646,6 +36667,283 @@
 	};
 
 
+
+/***/ },
+/* 297 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _testData = __webpack_require__(298);
+
+	var _utils = __webpack_require__(299);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * TreeMap Graph Component
+	 * @author James Wake
+	 * @class App
+	 */
+	var TreeMap = function (_React$Component) {
+	    _inherits(TreeMap, _React$Component);
+
+	    function TreeMap(props) {
+	        _classCallCheck(this, TreeMap);
+
+	        var _this = _possibleConstructorReturn(this, (TreeMap.__proto__ || Object.getPrototypeOf(TreeMap)).call(this, props));
+
+	        _this.d3 = {
+	            treemap: null,
+	            color: null,
+	            stratify: null,
+	            format: null,
+	            root: null,
+	            data: null
+	        };
+	        _this.state = {
+	            id: (0, _utils.generateUUID)("TreeMap"),
+	            size: { width: 960, height: 1060 }
+	        };
+
+	        _this.timeout = Date.now();
+	        return _this;
+	    }
+
+	    /**
+	     * Get the dimensions of the current containing div
+	     */
+
+
+	    _createClass(TreeMap, [{
+	        key: "getComponentDimensions",
+	        value: function getComponentDimensions() {
+	            //Use a square box representation with a 1x1 factor then resize to fit in the next phase using div.clientWidth
+	            //var divWidth = document.getElementById("mydiv").clientWidth;
+	            var divWidth = document.getElementById(this.state.id + "-container").clientWidth;
+	            var divHeight = document.getElementById(this.state.id + "-container").clientHeight;
+	            var divLeft = document.getElementById(this.state.id + "-container").clientLeft;
+	            var divTop = document.getElementById(this.state.id + "-container").clientTop;
+	            return { width: divWidth, height: divHeight, top: divTop, left: divLeft };
+	        }
+	    }, {
+	        key: "componentDidMount",
+	        value: function componentDidMount() {
+	            var dim = this.getComponentDimensions();
+	            this.setState({ size: dim });
+	            this.setupBaseD3();
+	            this.renderTreeMap(dim);
+	            this.configureResizeCallback();
+	        }
+
+	        /**
+	         * On Resize callback for TreeMap
+	         */
+
+	    }, {
+	        key: "componentResize",
+	        value: function componentResize() {
+	            var _this2 = this;
+
+	            if (this.timeout) {
+	                clearTimeout(this.timeoout);
+	                this.timeout = setTimeout(function () {
+	                    var dim = _this2.getComponentDimensions();
+	                    _this2.setState({ size: dim });
+	                    _this2.renderTreeMap(dim, true);
+	                    _this2.timeout = null;
+	                }, 100);
+	            }
+	        }
+	    }, {
+	        key: "configureResizeCallback",
+	        value: function configureResizeCallback() {
+	            var _this3 = this;
+
+	            //Update with compositable code
+	            window.onresize = function () {
+	                _this3.componentResize();
+	            };
+	        }
+	    }, {
+	        key: "render",
+	        value: function render() {
+	            return _react2.default.createElement(
+	                "div",
+	                { id: this.state.id + "-container", className: "treemap-container" },
+	                _react2.default.createElement("svg", { id: this.state.id, width: "100%", height: "100%" })
+	            );
+	        }
+
+	        /**
+	         * Setup basic d3 functions that do not need size or data
+	         */
+
+	    }, {
+	        key: "setupBaseD3",
+	        value: function setupBaseD3() {
+	            //D3 Format
+	            this.d3.format = d3.format(",d");
+
+	            //D3 Color Generator
+	            this.d3.color = d3.scaleOrdinal().range(d3.schemeCategory10.map(function (c) {
+	                c = d3.rgb(c);c.opacity = 0.6;return c;
+	            }));
+
+	            //D3 Data Stratification Function
+	            this.d3.stratify = d3.stratify().parentId(function (d) {
+	                return d.id.substring(0, d.id.lastIndexOf("."));
+	            });
+	        }
+
+	        /**
+	         * Sets up the TreeMap using the D3 Library
+	         */
+
+	    }, {
+	        key: "renderTreeMap",
+	        value: function renderTreeMap(dim, isUpdate) {
+	            var _this4 = this;
+
+	            console.log(this.state.size);
+
+	            //Define Dimensions
+	            // var width = this.props.size.width,
+	            // height = this.props.size.height;
+	            var width = this.state.size.width;
+	            var height = this.state.size.height;
+	            if (dim) {
+	                width = dim.width;
+	                height = dim.height;
+	            }
+
+	            //D3 Tree Map definition
+	            this.d3.treemap = d3.treemap().size([width, height]).padding(1).round(true);
+
+	            //Parse the csvData into d3 format
+	            this.d3.data = d3.csvParse(this.props.data, function (d) {
+	                d.value = +d.value;return d;
+	            });
+
+	            //Stratify the Data using the Stratification Funciton
+	            this.d3.root = this.d3.stratify(this.d3.data).sum(function (d) {
+	                return d.value;
+	            }).sort(function (a, b) {
+	                return b.height - a.height || b.value - a.value;
+	            });
+
+	            //Remove All Previous Nodes on Rerender (Functionality needs to be broken up)
+	            d3.select("#" + this.state.id).selectAll("*").remove();
+
+	            //Generate the Treemap and Render it to the target div
+	            this.d3.treemap(this.d3.root);
+	            var g = d3.select("#" + this.state.id).selectAll(".node").data(this.d3.root.leaves()).enter().append("g");
+	            //Treemap Boxes
+	            var box = g.append("rect").attr("class", "node").attr("title", function (d) {
+	                return d.id + "\n" + _this4.d3.format(d.value);
+	            }).attr("x", function (d) {
+	                return d.x0;
+	            }).attr("y", function (d) {
+	                return d.y0;
+	            }).attr("width", function (d) {
+	                return d.x1 - d.x0;
+	            }).attr("height", function (d) {
+	                return d.y1 - d.y0;
+	            }).style("fill", function (d) {
+	                while (d.depth > 1) {
+	                    d = d.parent;
+	                }return _this4.d3.color(d.id);
+	            }).style("stroke", function (d) {
+	                return "transparent";
+	            });
+	            //Text Cliping Box
+	            var clip = g.append('svg').attr("x", function (d) {
+	                return d.x0;
+	            }).attr("y", function (d) {
+	                return d.y0;
+	            }).attr("width", function (d) {
+	                return d.x1 - d.x0;
+	            }).attr("height", function (d) {
+	                return d.y1 - d.y0;
+	            }).style("overflow", "hidden");
+	            //Box Title Text
+	            clip.append("text").attr("class", "node-label").attr("x", function (d) {
+	                return 2;
+	            }).attr("y", function (d) {
+	                return 14;
+	            }).text(function (d) {
+	                return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n");
+	            });
+	            //Box Size Text
+	            clip.append("text").attr("class", "node-value").attr("x", function (d) {
+	                return 2;
+	            }).attr("y", function (d) {
+	                return d.y1 - d.y0 - 6;
+	            }).text(function (d) {
+	                return _this4.d3.format(d.value);
+	            });
+	            //Tool Tip
+	            g.append("svg:title").text(function (d) {
+	                return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + _this4.d3.format(d.value);
+	            });
+	        }
+	    }]);
+
+	    return TreeMap;
+	}(_react2.default.Component);
+
+	exports.default = TreeMap;
+	;
+
+/***/ },
+/* 298 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var csvData = exports.csvData = "id,value\nflare,\nflare.analytics,\nflare.analytics.cluster,\nflare.analytics.cluster.AgglomerativeCluster,3938\nflare.analytics.cluster.CommunityStructure,3812\nflare.analytics.cluster.HierarchicalCluster,6714\nflare.analytics.cluster.MergeEdge,743\nflare.analytics.graph,\nflare.analytics.graph.BetweennessCentrality,3534\nflare.analytics.graph.LinkDistance,5731\nflare.analytics.graph.MaxFlowMinCut,7840\nflare.analytics.graph.ShortestPaths,5914\nflare.analytics.graph.SpanningTree,3416\nflare.analytics.optimization,\nflare.analytics.optimization.AspectRatioBanker,7074\nflare.animate,\nflare.animate.Easing,17010\nflare.animate.FunctionSequence,5842\nflare.animate.interpolate,\nflare.animate.interpolate.ArrayInterpolator,1983\nflare.animate.interpolate.ColorInterpolator,2047\nflare.animate.interpolate.DateInterpolator,1375\nflare.animate.interpolate.Interpolator,8746\nflare.animate.interpolate.MatrixInterpolator,2202\nflare.animate.interpolate.NumberInterpolator,1382\nflare.animate.interpolate.ObjectInterpolator,1629\nflare.animate.interpolate.PointInterpolator,1675\nflare.animate.interpolate.RectangleInterpolator,2042\nflare.animate.ISchedulable,1041\nflare.animate.Parallel,5176\nflare.animate.Pause,449\nflare.animate.Scheduler,5593\nflare.animate.Sequence,5534\nflare.animate.Transition,9201\nflare.animate.Transitioner,19975\nflare.animate.TransitionEvent,1116\nflare.animate.Tween,6006\nflare.data,\nflare.data.converters,\nflare.data.converters.Converters,721\nflare.data.converters.DelimitedTextConverter,4294\nflare.data.converters.GraphMLConverter,9800\nflare.data.converters.IDataConverter,1314\nflare.data.converters.JSONConverter,2220\nflare.data.DataField,1759\nflare.data.DataSchema,2165\nflare.data.DataSet,586\nflare.data.DataSource,3331\nflare.data.DataTable,772\nflare.data.DataUtil,3322\nflare.display,\nflare.display.DirtySprite,8833\nflare.display.LineSprite,1732\nflare.display.RectSprite,3623\nflare.display.TextSprite,10066\nflare.flex,\nflare.flex.FlareVis,4116\nflare.physics,\nflare.physics.DragForce,1082\nflare.physics.GravityForce,1336\nflare.physics.IForce,319\nflare.physics.NBodyForce,10498\nflare.physics.Particle,2822\nflare.physics.Simulation,9983\nflare.physics.Spring,2213\nflare.physics.SpringForce,1681\nflare.query,\nflare.query.AggregateExpression,1616\nflare.query.And,1027\nflare.query.Arithmetic,3891\nflare.query.Average,891\nflare.query.BinaryExpression,2893\nflare.query.Comparison,5103\nflare.query.CompositeExpression,3677\nflare.query.Count,781\nflare.query.DateUtil,4141\nflare.query.Distinct,933\nflare.query.Expression,5130\nflare.query.ExpressionIterator,3617\nflare.query.Fn,3240\nflare.query.If,2732\nflare.query.IsA,2039\nflare.query.Literal,1214\nflare.query.Match,3748\nflare.query.Maximum,843\nflare.query.methods,\nflare.query.methods.add,593\nflare.query.methods.and,330\nflare.query.methods.average,287\nflare.query.methods.count,277\nflare.query.methods.distinct,292\nflare.query.methods.div,595\nflare.query.methods.eq,594\nflare.query.methods.fn,460\nflare.query.methods.gt,603\nflare.query.methods.gte,625\nflare.query.methods.iff,748\nflare.query.methods.isa,461\nflare.query.methods.lt,597\nflare.query.methods.lte,619\nflare.query.methods.max,283\nflare.query.methods.min,283\nflare.query.methods.mod,591\nflare.query.methods.mul,603\nflare.query.methods.neq,599\nflare.query.methods.not,386\nflare.query.methods.or,323\nflare.query.methods.orderby,307\nflare.query.methods.range,772\nflare.query.methods.select,296\nflare.query.methods.stddev,363\nflare.query.methods.sub,600\nflare.query.methods.sum,280\nflare.query.methods.update,307\nflare.query.methods.variance,335\nflare.query.methods.where,299\nflare.query.methods.xor,354\nflare.query.methods._,264\nflare.query.Minimum,843\nflare.query.Not,1554\nflare.query.Or,970\nflare.query.Query,13896\nflare.query.Range,1594\nflare.query.StringUtil,4130\nflare.query.Sum,791\nflare.query.Variable,1124\nflare.query.Variance,1876\nflare.query.Xor,1101\nflare.scale,\nflare.scale.IScaleMap,2105\nflare.scale.LinearScale,1316\nflare.scale.LogScale,3151\nflare.scale.OrdinalScale,3770\nflare.scale.QuantileScale,2435\nflare.scale.QuantitativeScale,4839\nflare.scale.RootScale,1756\nflare.scale.Scale,4268\nflare.scale.ScaleType,1821\nflare.scale.TimeScale,5833\nflare.util,\nflare.util.Arrays,8258\nflare.util.Colors,10001\nflare.util.Dates,8217\nflare.util.Displays,12555\nflare.util.Filter,2324\nflare.util.Geometry,10993\nflare.util.heap,\nflare.util.heap.FibonacciHeap,9354\nflare.util.heap.HeapNode,1233\nflare.util.IEvaluable,335\nflare.util.IPredicate,383\nflare.util.IValueProxy,874\nflare.util.math,\nflare.util.math.DenseMatrix,3165\nflare.util.math.IMatrix,2815\nflare.util.math.SparseMatrix,3366\nflare.util.Maths,17705\nflare.util.Orientation,1486\nflare.util.palette,\nflare.util.palette.ColorPalette,6367\nflare.util.palette.Palette,1229\nflare.util.palette.ShapePalette,2059\nflare.util.palette.SizePalette,2291\nflare.util.Property,5559\nflare.util.Shapes,19118\nflare.util.Sort,6887\nflare.util.Stats,6557\nflare.util.Strings,22026\nflare.vis,\nflare.vis.axis,\nflare.vis.axis.Axes,1302\nflare.vis.axis.Axis,24593\nflare.vis.axis.AxisGridLine,652\nflare.vis.axis.AxisLabel,636\nflare.vis.axis.CartesianAxes,6703\nflare.vis.controls,\nflare.vis.controls.AnchorControl,2138\nflare.vis.controls.ClickControl,3824\nflare.vis.controls.Control,1353\nflare.vis.controls.ControlList,4665\nflare.vis.controls.DragControl,2649\nflare.vis.controls.ExpandControl,2832\nflare.vis.controls.HoverControl,4896\nflare.vis.controls.IControl,763\nflare.vis.controls.PanZoomControl,5222\nflare.vis.controls.SelectionControl,7862\nflare.vis.controls.TooltipControl,8435\nflare.vis.data,\nflare.vis.data.Data,20544\nflare.vis.data.DataList,19788\nflare.vis.data.DataSprite,10349\nflare.vis.data.EdgeSprite,3301\nflare.vis.data.NodeSprite,19382\nflare.vis.data.render,\nflare.vis.data.render.ArrowType,698\nflare.vis.data.render.EdgeRenderer,5569\nflare.vis.data.render.IRenderer,353\nflare.vis.data.render.ShapeRenderer,2247\nflare.vis.data.ScaleBinding,11275\nflare.vis.data.Tree,7147\nflare.vis.data.TreeBuilder,9930\nflare.vis.events,\nflare.vis.events.DataEvent,2313\nflare.vis.events.SelectionEvent,1880\nflare.vis.events.TooltipEvent,1701\nflare.vis.events.VisualizationEvent,1117\nflare.vis.legend,\nflare.vis.legend.Legend,20859\nflare.vis.legend.LegendItem,4614\nflare.vis.legend.LegendRange,10530\nflare.vis.operator,\nflare.vis.operator.distortion,\nflare.vis.operator.distortion.BifocalDistortion,4461\nflare.vis.operator.distortion.Distortion,6314\nflare.vis.operator.distortion.FisheyeDistortion,3444\nflare.vis.operator.encoder,\nflare.vis.operator.encoder.ColorEncoder,3179\nflare.vis.operator.encoder.Encoder,4060\nflare.vis.operator.encoder.PropertyEncoder,4138\nflare.vis.operator.encoder.ShapeEncoder,1690\nflare.vis.operator.encoder.SizeEncoder,1830\nflare.vis.operator.filter,\nflare.vis.operator.filter.FisheyeTreeFilter,5219\nflare.vis.operator.filter.GraphDistanceFilter,3165\nflare.vis.operator.filter.VisibilityFilter,3509\nflare.vis.operator.IOperator,1286\nflare.vis.operator.label,\nflare.vis.operator.label.Labeler,9956\nflare.vis.operator.label.RadialLabeler,3899\nflare.vis.operator.label.StackedAreaLabeler,3202\nflare.vis.operator.layout,\nflare.vis.operator.layout.AxisLayout,6725\nflare.vis.operator.layout.BundledEdgeRouter,3727\nflare.vis.operator.layout.CircleLayout,9317\nflare.vis.operator.layout.CirclePackingLayout,12003\nflare.vis.operator.layout.DendrogramLayout,4853\nflare.vis.operator.layout.ForceDirectedLayout,8411\nflare.vis.operator.layout.IcicleTreeLayout,4864\nflare.vis.operator.layout.IndentedTreeLayout,3174\nflare.vis.operator.layout.Layout,7881\nflare.vis.operator.layout.NodeLinkTreeLayout,12870\nflare.vis.operator.layout.PieLayout,2728\nflare.vis.operator.layout.RadialTreeLayout,12348\nflare.vis.operator.layout.RandomLayout,870\nflare.vis.operator.layout.StackedAreaLayout,9121\nflare.vis.operator.layout.TreeMapLayout,9191\nflare.vis.operator.Operator,2490\nflare.vis.operator.OperatorList,5248\nflare.vis.operator.OperatorSequence,4190\nflare.vis.operator.OperatorSwitch,2581\nflare.vis.operator.SortOperator,2023\nflare.vis.Visualization,16540";
+
+/***/ },
+/* 299 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.generateUUID = generateUUID;
+	/**
+	 * Generate UUIDs
+	 * Code originally from: https://jsfiddle.net/briguy37/2MVFd/
+	 */
+	function generateUUID(componentType) {
+	    var d = new Date().getTime();
+	    return (componentType + '-xxxx-4xxx-yxxx-xxxxxxxxxxxx').replace(/[xy]/g, function (c) {
+	        var r = (d + Math.random() * 16) % 16 | 0;
+	        d = Math.floor(d / 16);
+	        return (c == 'x' ? r : r & 0x3 | 0x8).toString(16);
+	    });
+	}
 
 /***/ }
 /******/ ]);

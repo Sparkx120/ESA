@@ -1,14 +1,44 @@
 //Base Styles
 body{
-    font-size: 1em
+    font-size: 1em;
+    margin: 0%;
 }
 
 .App{
     width:100vw;
-    height:100vw;
+    height:100vh;
     margin: 0%;
 }
 
 .PageContainer{
     width:100vw;
+}
+
+.treemap-container{
+    position: relative;
+    width: 90%;
+    height: 90%;
+}
+
+.treeMap{
+    width:  90%;
+    height: 90%;
+}
+
+.node{
+    box-sizing: border-box;
+    position: absolute;
+    overflow: hidden;
+}
+
+.node-label{
+    padding: 4px;
+    line-height: 1em;
+    // white-space: pre;
+}
+
+.node-value{
+    color: rgba(0,0,0,0.8);
+    font-size: 9px;
+    margin-top: 1px;
 }
