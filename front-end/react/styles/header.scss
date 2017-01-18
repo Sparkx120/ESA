@@ -1,0 +1,108 @@
+
+element.style {
+    margin-bottom: 0;
+}
+
+nav{
+    display: block;
+}
+.navbar-default {
+    background-color: #f8f8f8;
+    border-color: #e7e7e7;
+}
+
+.navbar-static-top {
+    border-radius: 0;
+}
+.navbar-static-top {
+    z-index: 1000;
+    border-width: 0 0 1px;
+}
+.navbar {
+    border-radius: 4px;
+    position: relative;
+    height: 50px;
+    border: 1px solid #e7e7e7;
+    
+}
+
+.navbar-left {
+    float: left;
+}
+
+.navbar-default .navbar-brand {
+    color: #777;
+}
+
+.navbar-brand {
+    float: left;
+    height: 50px;
+    padding: 15px 15px;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+a{
+    font-size: 1.5vw;
+}
+
+.navbar-right{
+    float: right!important;
+    padding-left: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+  
+   
+}
+
+.username{
+    // float: right;
+    // display: inline-block;
+    vertical-align: top;
+    height: 50px;
+    padding: 10px 10px;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+.usericon{
+    // float: right;
+    display: inline-block;
+    padding-top: 2px;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+element.style {
+    visibility: visible;
+}
+
+.Menu__MenuOption--active {
+    background-color: #0aafff;
+}
+
+.Menu__MenuOption {
+    padding: 5px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.Menu__MenuOptions {
+    width: 100px;
+}
+
+.Menu__MenuOptions--vertical-top {
+    bottom: 45px;
+}
+
+.Menu__MenuOptions--horizontal-right {
+    left: 0px;
+}
+
+.Menu__MenuOptions {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #FFF;
+    // position: absolute;
+}

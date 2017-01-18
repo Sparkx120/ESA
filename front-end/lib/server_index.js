@@ -32,5 +32,5 @@ server.listen(port, bind, ()=> log.info(`Listening on ${bind}:${port}`));
 io.on('connection', function (socket) {
   log.info("Socket Connected"); //Dummy Socket for now
   
-  socket.on("home", () => socket.emit("home", "Hello World From the Server"));
+  socket.on("home", () => socket.emit("home", "Hello World From the server"));
 });

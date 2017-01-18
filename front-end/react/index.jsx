@@ -5,17 +5,20 @@
  */
 import React  from 'react';
 import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
-import scss from './styles/style.scss'; //Import Styles Here
+// import scss from './styles/style.scss'; //Import Styles Here
 
 //Static Routing for React App
-import App from './components/App.jsx';
-import Home from './components/Pages/Home.jsx'
+import App from './components/App.jsx';	
+import Accordion from './components/Accordion.jsx';
 
-render((
+ReactDOM.render((
   <Router history={browserHistory}>
 		<Route path="/" component={App}>
-			<IndexRoute component={Home}/>
+		{/*	<IndexRoute component={Accordion}/>     */}
+			
+		{/*	<Route path="/chart" component={Chart}/>  */}
 		</Route>
 	</Router>
 ), document.getElementById('react'));
