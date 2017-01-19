@@ -17,7 +17,6 @@ function processDirectories(dirs) {
     for (let dir of dirs) {
         // process the directory
         let processed = indexer.processDirectory(dir);
-        //toBeProcessed = toBeProcessed.concat(processed.toProcess);
 
         // accumulate profiler metrics
         totalFiles += processed.filesProcessed;

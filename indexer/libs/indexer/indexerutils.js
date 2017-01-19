@@ -70,8 +70,13 @@ export default {
 
                     // add the file to processed list
                     if (fileFso != null) {
+                        // add the additional fields to file system object
                         let fileFsoAsObj = fileFso.toObject();
-                        fileFsoAsObj.parent = dirInfo.name;
+                        fileFsoAsObj.parent = fso.name;
+                        fileFsoAsObj.fileCount = 0;
+                        fileFsoAsObj.dirsCount = 0;
+
+                        // push file system object to process list
                         processed.push(fileFsoAsObj);
                     }
                 }
@@ -79,13 +84,17 @@ export default {
 
                 // enqueue all the directories with their parent's name to the return queue
                 for (let subDir of fso.folders) {
-                    continueQ.push({ parent: dirInfo.name, name: subDir });
+                    continueQ.push({ parent: fso.name, name: subDir });
                 }
             }
 
-            // add the root directory to the processed list
+            // add the additional fields to file system object
             let fsoAsObj = fso.toObject();
             fsoAsObj.parent = dirInfo.parent;
+            fsoAsObj.fileCount = (fso.isDirectory ? fso.files.length : 0);
+            fsoAsObj.dirsCount = (fso.isDirectory ? fso.folders.length : 0);
+
+            // push file system object to process list
             processed.push(fsoAsObj);
         }
 

@@ -6,79 +6,6 @@ import mongodb from "mongodb";
 /** @constant {number} */
 const BUFFER_THRESHOLD = 2048;
 
-/** Helper class to count the number of outgoing MongoDB calls. */
-class MongoCount {
-
-    /**
-     * Creates an instance of MongoCount.
-     * 
-     * @author Jonathan Tan
-     */
-    constructor() {
-        this._outgoingCount = 0;
-        this._readyToClose = false;
-    }
-
-    /* setters and getters */
-    set outgoingCount(value)    { this._outgoingCount = value; }
-    get outgoingCount()         { return this._outgoingCount; }
-    set readyToClose(value)     { this._readyToClose = value; }
-    get readyToClose()          { return this._readyToClose; }
-}
-
-/**
- * Closes the connection to the database if appropriate.
- * 
- * @author Jonathan Tan
- * @param {mongodb.Db} database - The database instance.
- * @param {MongoCount} mongoCounter - A counter to keep track of outgoing database calls.
- */
-function checkReadyToClose(database, mongoCounter) {
-    if (mongoCounter.readyToClose && mongoCounter.outgoingCount == 0) {
-        database.close();
-        database = null;
-        logger.debug("Closed connection to the database.");
-    }
-}
-
-/**
- * Inserts all objects in the buffer into the database.
- * 
- * @author Jonathan Tan
- * @param {Object[]} buffer - An array of objects to be inserted.
- * @param {string} collection - The name of the collection into which to insert.
- * @param {mongodb.Db} database - The database instance.
- * @param {MongoCount} mongoCounter - A counter to keep track of outgoing database calls.
- */
-function sendBufferToDatabase(buffer, collection, database, mongoCounter) {
-    if (buffer.length != 0) {
-        mongoCounter.outgoingCount++;
-        database.collection(collection).insertMany(buffer, (error, result) => {
-            if (error) {
-                logger.error(error.toString());
-            }
-            mongoCounter.outgoingCount--;
-
-            // if no outgoing inserts, close the connection
-            checkReadyToClose(database, mongoCounter);
-        });
-    }
-}
-
-/**
- * Sends all objects in all buffers to the database.
- * 
- * @author Jonathan Tan
- * @param {Map.<string, Object[]>} bufferMap - A mapping from collection name to buffered objects to be inserted.
- * @param {mongodb.Db} database - The database instance.
- * @param {MongoCount} mongoCounter - A counter to keep track of outgoing database calls.
- */
-function sendAllBuffersToDatabase(bufferMap, database, mongoCounter) {
-    for (let b of bufferMap.entries()) {
-        sendBufferToDatabase(b[1], b[0], database, mongoCounter);
-    }
-}
-
 /** Class to manage interactions with a MongoDB server. */
 export default class Mongo {
 
@@ -97,6 +24,13 @@ export default class Mongo {
      */
 
     /**
+     * Callback to execute when the connection to the database is gracefully closed.
+     * 
+     * @author Jonathan Tan
+     * @callback onConnectionClose
+     */
+
+    /**
      * Attempts to establish a connection with the MongoDB server.
      * 
      * @author Jonathan Tan
@@ -106,8 +40,9 @@ export default class Mongo {
      * @param {number} poolSize - Number of connections in the connection pool.
      * @param {onConnectSuccess} onSuccess - The callback to execute if the connection was successfully established.
      * @param {onConnectFail} onFail - The callback to execute if the connection could not be established.
+     * @param {onConnectionClose} onExit - The callback to execute when the connection to the database closes.
      */
-    connectTo(server, port, name, poolSize, onSuccess, onFail) {
+    connectTo(server, port, name, poolSize, onSuccess, onFail, onExit) {
         mongodb.MongoClient.connect(`mongodb://${server}:${port}/${name}`, { server: { poolSize } }, (error, db) => {
             if (error) {
                 logger.debug(error.toString());
@@ -118,64 +53,156 @@ export default class Mongo {
                 logger.debug("Successfully connected to the database.");
 
                 this._database = db;
-                this._addBuffers = new Map();
-                this._counter = new MongoCount();
+                this._writeBuffers = new Map();
+                this._outgoingCount = 0;
+                this._readyToClose = false;
+                this._closeCallback = onExit;
                 onSuccess();
             }
         });
     }
 
     /**
-     * Closes the connection to the MongoDB server.
+     * Callback to execute once a buffer has been sent to the database.
+     * 
+     * @author Jonathan Tan
+     * @callback bufferSentCallback
+     */
+
+    /**
+     * Sends all objects in the buffer into the database.
+     * 
+     * @author Jonathan Tan
+     * @param {Object[]} buffer - An array of write operations to be send.
+     * @param {string} collection - The name of the collection to which to send.
+     * @param {bufferSentCallback} callback - Callback to execute once buffer has been sent.
+     */
+    _sendBufferToDatabase(buffer, collection, callback) {
+        if (buffer.length != 0) {
+            this._outgoingCount++;
+            this._database.collection(collection).bulkWrite(buffer, (error, result) => {
+                if (error) {
+                    logger.error(error.toString());
+                }
+                this._outgoingCount--;
+
+                // execute callback once write completes
+                callback();
+
+                // check if user has signaled the connection to be closed once all outgoing calls return
+                if (this._outgoingCount == 0 && this._readyToClose == true) {
+                    // closes the connection to the database
+                    this._database.close(() => {
+                        // execute a closing callback if one is set
+                        if (this._closeCallback) {
+                            this._closeCallback();
+                        }
+                    });
+                    this._database = null;
+                }
+            });
+        } else {
+            // execute callback as buffer is empty
+            callback();
+        }
+    }
+
+    /**
+     * Callback to execute once all buffers are sent to the database.
+     * 
+     * @author Jonathan Tan
+     * @callback buffersFlushedCallback
+     */
+
+    /**
+     * Sends all objects in all buffers to the database.
+     * 
+     * @author Jonathan Tan
+     * @param {buffersFlushedCallback} callback - Callback to execute once all buffers have been sent.
+     */
+    _sendAllBuffersToDatabase(callback) {
+        let numBuffers = this._writeBuffers.size;
+
+        if (numBuffers == 0) {
+            // execute callback as there are no buffers to flush
+            callback();
+        } else {
+            for (let b of this._writeBuffers.entries()) {
+                // send the buffer to the database
+                this._sendBufferToDatabase(b[1], b[0], () => {
+                    numBuffers--;
+
+                    // execute callback once all buffers are sent to the server
+                    if (numBuffers == 0) {
+                        callback();
+                    }
+                });
+
+                // set the buffer to be empty
+                this._writeBuffers.set(b[0], []);
+            }
+        }
+    }
+
+    /**
+     * Flushes all buffers and closes the conection once all outgoing calls return.
      * 
      * @author Jonathan Tan
      */
     close() {
         if (this._database) {
             // flush all buffers
-            sendAllBuffersToDatabase(this._addBuffers, this._database, this._counter);
-            this._addBuffers = null;
-
-            // wait for all MongoDB calls to finish
-            this._counter.readyToClose = true;
-            logger.debug("Waiting for database calls to finish...");
-            checkReadyToClose(this._database, this._counter);
+            this._sendAllBuffersToDatabase(() => {
+                // signal that the connection is waiting to be closed
+                this._readyToClose = true;
+            });
+            this._writeBuffers = null;
         } else {
             logger.debug("There is no open connection to the database to close.");
         }
     }
 
     /**
-     * Buffers a new object to be added to the databse. Will only send the objects to the database if buffer exceeds a threshold.
+     * Buffers a write operation to be sent to the database. Will only send the objects to the database if buffer exceeds a threshold.
      * 
      * @author Jonathan Tan
-     * @param {Object|Object[]} obj - The object to send to the database. The function assumes that the object is well-formatted.
+     * @param {Object} op - The write operation.
+     * @param {string} collection - The name of the collection to which to write.
+     */
+    _writeToCollection(op, collection) {
+        // adds the write operation to the appropriate buffer
+        if (this._writeBuffers.has(collection)) {
+            this._writeBuffers.get(collection).push(op);
+        } else {
+            this._writeBuffers.set(collection, [op]);
+        }
+
+        // flush buffer if it has exceeded the threshold
+        if (this._writeBuffers.get(collection).length >= BUFFER_THRESHOLD) {
+            this._sendBufferToDatabase(this._writeBuffers.get(collection), collection, () => { });
+            this._writeBuffers.set(collection, []);
+        }
+    }
+
+    /**
+     * Buffers a new object or objects to be added to the databse.
+     * 
+     * @author Jonathan Tan
+     * @param {Object|Object[]} obj - The object, or an array of objects, to send to the database. The function assumes that objects are well-formatted.
      * @param {string} collection - The name of the collection into which to add.
      */
     addToCollection(obj, collection) {
         if (this._database === undefined || this._database == null) {
-            logger.error("Error: Attempted to add to uninitialized database.")
+            logger.error("Error: Attempted to add to uninitialized database.");
         } else {
             if (Array.isArray(obj)) {
-                // add entire array to the appropriate buffer
-                if (this._addBuffers.has(collection)) {
-                    this._addBuffers.set(collection, this._addBuffers.get(collection).concat(obj));
-                } else {
-                    this._addBuffers.set(collection, obj);
+                // add multiple insert operations to the queue
+                for (let doc of obj) {
+                    this._writeToCollection({ insertOne: { document: doc } }, collection);
                 }
             } else {
-                // add object to the appropriate buffer
-                if (this._addBuffers.has(collection)) {
-                    this._addBuffers.get(collection).push(obj);
-                } else {
-                    this._addBuffers.set(collection, [obj]);
-                }
-            }
-
-            // flush buffer if it has exceeded the threshold
-            if (this._addBuffers.get(collection).length >= BUFFER_THRESHOLD) {
-                sendBufferToDatabase(this._addBuffers.get(collection), collection, this._database, this._counter);
-                this._addBuffers.set(collection, []);
+                // add a single insert operation to the queue
+                this._writeToCollection({ insertOne: { document: obj } }, collection);
             }
         }
     }

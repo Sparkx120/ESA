@@ -3,6 +3,7 @@
 import fs from "fs";
 import logger from "../logging/logger";
 import os from "os";
+import path from "path"
 
 /** Representation of a file system object. */
 export default class FileSystemObject {
@@ -63,6 +64,10 @@ export default class FileSystemObject {
         let unknown = 0;
 
         try {
+            // normalize file path
+            filename = path.normalize(filename);
+
+            // get information about the file
             let stats = fs.lstatSync(filename);
 
             if (stats.isDirectory()) {
@@ -76,7 +81,7 @@ export default class FileSystemObject {
                     // separate contained files into by whether they are a directory or not
                     for (let f of contained) {
                         try {
-                            let fFullpath = `${filename}/${f}`;
+                            let fFullpath = path.normalize(`${filename}${path.sep}${f}`);
                             let fStats = fs.lstatSync(fFullpath);
 
                             // add the files to the correct list
