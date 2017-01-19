@@ -13,8 +13,6 @@ export default class Home extends React.Component {
         super(...args);
         this.state = {
             "home": "",
-            graphWidth: 960,
-            graphHeight: 1060
         }
     }
     //React on Mount

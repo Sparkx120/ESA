@@ -54,13 +54,13 @@ export default class TreeMap extends React.Component {
     componentResize(){
         if(this.timeout){
             clearTimeout(this.timeoout);
-            this.timeout = setTimeout(()=>{
-                let dim = this.getComponentDimensions();
-                this.setState({size:dim});
-                this.renderTreeMap(dim, true);
-                this.timeout = null;
-            }, 100);
         }
+        this.timeout = setTimeout(()=>{
+            let dim = this.getComponentDimensions();
+            //this.setState({size:dim});
+            this.renderTreeMap(dim, true);
+            this.timeout = null;
+        }, 100);
     }
 
     configureResizeCallback(){
@@ -69,6 +69,10 @@ export default class TreeMap extends React.Component {
     }
 
     render() {
+        if(this.props.accordianScaling){
+            console.log("Scaling from split view detected");
+            this.componentResize();
+        }
         return(
             <div id={this.state.id + "-container"} className="treemap-container">
                 <svg id={this.state.id} width="100%" height="100%"></svg>

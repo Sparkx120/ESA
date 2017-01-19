@@ -10,7 +10,7 @@
     "build-frontend": "webpack",
     "dev-test": "webpack-dev-server --port 8090 --hot --watch --colors --content-base ./www",
     "watch": "webpack --hot --watch --colors",
-    "server": "node server | ./node_modules/.bin/bunyan",
+    "server": "node server | bunyan",
     "dev": "concurrently \"npm run watch\" \"npm run server\""
   },
   "authors": [

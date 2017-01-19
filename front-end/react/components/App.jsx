@@ -19,9 +19,8 @@ export default class App extends React.Component {
         return(
             <div id="wrapper" className='root'>
                 <Header/>
-                <Accordion/>  
-                  
-             {/*  {this.props.children}    */}
+               {/* <Accordion/> */}
+               {this.props.children}
              {/* default page from RouteIndex in index.jsx;
                  Welcome.jsx in this case*/}
             </div>

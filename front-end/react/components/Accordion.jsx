@@ -24,7 +24,7 @@ class Accordion extends React.Component{
         
         return(
 //             {/*
-         <SplitPane split="vertical" defaultSize="98%" maxSize="1260">
+         <SplitPane split="vertical" defaultSize="0%" maxSize="1260">
             <h1 id='welcome'>Welcome to 4J!!!</h1>
             <SplitPane split="vertical" defaultSize="33%" maxSize="1235">
                 <FileSystem/>
@@ -33,7 +33,7 @@ class Accordion extends React.Component{
                     <Graphs/>
                 </SplitPane>
             </SplitPane>
-         </SplitPane> 
+        </SplitPane>
 //   */}
  
 //   {/*

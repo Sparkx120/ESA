@@ -5,7 +5,7 @@ import {Slider, Toggle} from 'react-filters/dist';
 import CollapseOpt from './CollapseOpt.jsx';
 import FaAngleDoubleDown from 'react-icons/lib/fa/angle-double-down';
 import DatePicker from 'react-datepicker';
-import scss from 'react-datepicker/dist/react-datepicker.scss';
+//import scss from 'react-datepicker/dist/react-datepicker.scss';
 
 
 class FilterOpt extends React.Component{

@@ -231,6 +231,8 @@ class SplitPane extends Component {
             this.props.pane2Style || {}),
         );
 
+        console.log(typeof children[1] !== 'string' && React.Component.prototype.isPrototypeOf((children[1].type).prototype))
+
         return (
             <div
                 className={classes.join(' ')}
@@ -249,7 +251,11 @@ class SplitPane extends Component {
                       undefined
                     }
                 >
-                    {children[0]}
+                    {
+                        typeof children[0] !== 'string' && React.Component.prototype.isPrototypeOf((children[0].type).prototype) ?
+                            React.cloneElement(children[0], { accordianScaling: this.state.active | this.props.accordianScaling }) :
+                            children[0]
+                    }
                 </Pane>
                 <Resizer
                     ref={(node) => { this.resizer = node; }}
@@ -259,7 +265,6 @@ class SplitPane extends Component {
                     resizerClassName={this.props.resizerClassName}
                     onMouseDown={this.onMouseDown}
                     onTouchStart={this.onTouchStart}
-
                     onTouchEnd={this.onMouseUp}
                     style={this.props.resizerStyle || {}}
                     split={split}
@@ -276,7 +281,11 @@ class SplitPane extends Component {
                       undefined
                     }
                 >
-                    {children[1]}
+                    {
+                        typeof children[1] !== 'string' && React.Component.prototype.isPrototypeOf((children[1].type).prototype) ?
+                            React.cloneElement(children[1], { accordianScaling: this.state.active | this.props.accordianScaling }) :
+                            children[1]
+                    }
                 </Pane>
 
             </div>

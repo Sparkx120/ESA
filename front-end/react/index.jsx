@@ -11,14 +11,17 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 
 //Static Routing for React App
 import App from './components/App.jsx';	
+import Home from './components/Pages/Home.jsx';
 import Accordion from './components/Accordion.jsx';
+import LandingPage from './components/LandingPage.jsx';
 
 ReactDOM.render((
   <Router history={browserHistory}>
 		<Route path="/" component={App}>
-		{/*	<IndexRoute component={Accordion}/>     */}
-			
-		{/*	<Route path="/chart" component={Chart}/>  */}
+			<IndexRoute component={Accordion}/>
+			<Route path='/fs' component={Accordion}/>
+			<Route path='/landing' component={LandingPage}/>
+			<Route path="/test" component={Home}/>
 		</Route>
 	</Router>
 ), document.getElementById('react'));
