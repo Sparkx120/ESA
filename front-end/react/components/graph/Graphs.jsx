@@ -38,7 +38,7 @@ class Graphs extends React.Component{
                 <hr/>
                 <div id="graph-box">
                     <h3>{this.state.home}</h3>
-                    <TreeMap accordianScaling={this.props.accordianScaling} data={csvData} className="treeMap"/>
+                    <TreeMap accordianScaling={this.props.accordianScaling} type="csv" data={csvData} className="treeMap"/>
                 </div>
             </div>
         )

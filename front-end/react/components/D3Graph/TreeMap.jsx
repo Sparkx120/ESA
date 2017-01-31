@@ -1,7 +1,6 @@
 import React from "react";
-import { csvData } from "./testData.js"
 import { generateUUID } from "../utils.js"
-
+import { setResizeCallback } from "../../containers/callbackblock.jsx"
 /**
  * TreeMap Graph Component
  * @author James Wake
@@ -48,6 +47,10 @@ export default class TreeMap extends React.Component {
         this.configureResizeCallback();
     }
 
+    componentWillUnmount(){
+        setResizeCallback(this.state.id, ()=>{});
+    }
+
     /**
      * On Resize callback for TreeMap
      */
@@ -59,13 +62,13 @@ export default class TreeMap extends React.Component {
             let dim = this.getComponentDimensions();
             //this.setState({size:dim});
             this.renderTreeMap(dim, true);
-            this.timeout = null;
-        }, 100);
+            // this.timeout = null;
+        }, 20);
     }
 
     configureResizeCallback(){
         //Update with compositable code
-        window.onresize = ()=>{this.componentResize()};
+        setResizeCallback(this.state.id, ()=>{this.componentResize()});
     }
 
     render() {
@@ -89,8 +92,12 @@ export default class TreeMap extends React.Component {
 
         //D3 Color Generator
         this.d3.color = d3.scaleOrdinal()
-            .range(d3.schemeCategory10
-                .map((c)=>{ c = d3.rgb(c); c.opacity = 0.6; return c; }));
+            .range(d3.schemeCategory10.map((c)=>{ c = d3.rgb(c); c.opacity = 0.6; return c; }));
+        
+        //D3 Linear Color Generator
+        // this.d3.color = d3.scale.linear()
+        //     .range(['lightgreen', 'darkgreen']) // or use hex values
+        //     .domain([0, Infinity]);
 
         //D3 Data Stratification Function
         this.d3.stratify = d3.stratify()
@@ -116,23 +123,37 @@ export default class TreeMap extends React.Component {
         //D3 Tree Map definition
         this.d3.treemap = d3.treemap()
             .size([width, height])
-            .padding(1)
+            .padding(0)
             .round(true);
         
-        //Parse the csvData into d3 format
-        this.d3.data = d3.csvParse(this.props.data, (d)=>{d.value = +d.value;return d;});
-        
-        //Stratify the Data using the Stratification Funciton
-        this.d3.root = this.d3.stratify(this.d3.data)
-            .sum((d)=>{ return d.value; })
-            .sort((a, b)=>{ return b.height - a.height || b.value - a.value; });
-        
+        //CSV Parser
+        if(this.props.type == "csv"){
+            //Parse the csvData into d3 format
+            this.d3.data = d3.csvParse(this.props.data, (d)=>{d.value = +d.value;return d;});
+            
+            //Stratify the Data using the Stratification Funciton
+            this.d3.root = this.d3.stratify(this.d3.data)
+                .sum((d)=>{ return d.value; })
+                .sort((a, b)=>{ return b.height - a.height || b.value - a.value; });
+        }
+
+        //Json Data parser
+        else if(this.props.type == "json"){
+            //Json Data
+            this.d3.root = d3.hierarchy(this.props.data)
+                .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "/" : "") + d.data.id; })
+                .sum((d)=>{ if(d.children == null) return d.size; else return 0})
+                .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
+            //console.log(this.d3.root);
+        }
+
         //Remove All Previous Nodes on Rerender (Functionality needs to be broken up)
         d3.select(`#${this.state.id}`)
-            .selectAll("*").remove();
-        
+            .selectAll("*").remove(); //This is not working right
+
         //Generate the Treemap and Render it to the target div
         this.d3.treemap(this.d3.root);
+        console.log(this.d3);
         let g = d3.select(`#${this.state.id}`)
             .selectAll(".node")
             .data(this.d3.root.leaves())
@@ -145,8 +166,8 @@ export default class TreeMap extends React.Component {
             .attr("y", (d)=>{ return d.y0; })
             .attr("width", (d)=>{ return d.x1 - d.x0; })
             .attr("height", (d)=>{ return d.y1 - d.y0; })
-            .style("fill", (d)=>{ while (d.depth > 1) d = d.parent; return this.d3.color(d.id); })
-	        .style("stroke", (d)=>{ return "transparent"})
+            .style("fill", (d)=>{ while (d.depth > 2) d = d.parent; return this.d3.color(d.value); })
+	        .style("stroke", "white" /*"transparent"*/)
         //Text Cliping Box
 	    let clip = g.append('svg')
             .attr("x", (d)=>{ return d.x0; })
@@ -159,7 +180,7 @@ export default class TreeMap extends React.Component {
             .attr("class", "node-label")
 	        .attr("x", (d)=>{return 2;})
 	        .attr("y", (d)=>{return 14;})
-            .text((d)=>{ return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
+            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n");})
         //Box Size Text
         clip.append("text")
             .attr("class", "node-value")
@@ -168,6 +189,18 @@ export default class TreeMap extends React.Component {
             .text((d)=>{ return this.d3.format(d.value); });
         //Tool Tip
         g.append("svg:title")
-            .text((d)=>{ return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
+            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
+        // let c = d3.select(`#${this.state.id}`)
+        //     .selectAll(".node")
+        //     .data(this.d3.root.children)
+        //     .enter().append("g");
+        // let box2 = c.append("rect")
+        //     .attr("title", (d)=>{ return d.id + "\n" + this.d3.format(d.value); })
+        //     .attr("x", (d)=>{ return d.x0; })
+        //     .attr("y", (d)=>{ return d.y0; })
+        //     .attr("width", (d)=>{ return d.x1 - d.x0; })
+        //     .attr("height", (d)=>{ return d.y1 - d.y0; })
+        //     .style("fill", (d)=>{ while (d.depth > 1) d = d.parent; return this.d3.color(d.id); })
+	    //     .style("stroke", "white" /*"transparent"*/)
     }
 };

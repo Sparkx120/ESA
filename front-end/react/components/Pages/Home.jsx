@@ -1,7 +1,7 @@
 import React from 'react';
 import socket from '../../socket.js'
 import TreeMap from '../D3Graph/TreeMap.jsx'
-import { csvData } from '../D3Graph/testData.js'
+import { csvData, jsonFile, jsonFiles2, jsonFiles3 } from "../D3Graph/testData.js"
 /**
  * Home Page
  * @author James Wake
@@ -40,7 +40,11 @@ export default class Home extends React.Component {
         return(
             <div className="PageContainer">
                 <h1>{this.state.home}</h1>
-                <TreeMap data={csvData} className="treeMap"/>
+                <TreeMap data={jsonFiles2} type="json" className="treeMap"/>
+                <br/>
+                <TreeMap data={jsonFiles3} type="json" className="treeMap"/>
+                <br/>
+                <TreeMap data={csvData} type="csv" className="treeMap"/>
             </div>
         );
 	}

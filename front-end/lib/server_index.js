@@ -25,10 +25,15 @@ const staticPath = path.join(path.dirname(require.main.filename), '/www');
 log.info(`Static Hosting Path Set to: ${staticPath}`)
 app.use(express.static(staticPath));
 
-//Start the Server
+//Temporary Static Routing for React Routes (Will make dynamic later)
+app.use('/fs', express.static(`${path.join(staticPath,'index.html')}`))
+app.use('/landing', express.static(`${path.join(staticPath,'index.html')}`))
+app.use('/test', express.static(`${path.join(staticPath,'index.html')}`))
+
+//Start the Server (Server Listening in seperate library)
 server.listen(port, bind, ()=> log.info(`Listening on ${bind}:${port}`));
 
-//Handle Socket IO Connections
+//Handle Socket IO Connections (Move to seperate Library)
 io.on('connection', function (socket) {
   log.info("Socket Connected"); //Dummy Socket for now
   

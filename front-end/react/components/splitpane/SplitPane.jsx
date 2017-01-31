@@ -231,7 +231,7 @@ class SplitPane extends Component {
             this.props.pane2Style || {}),
         );
 
-        console.log(typeof children[1] !== 'string' && React.Component.prototype.isPrototypeOf((children[1].type).prototype))
+        //console.log(typeof children[1] !== 'string' && React.Component.prototype.isPrototypeOf((children[1].type).prototype))
 
         return (
             <div
