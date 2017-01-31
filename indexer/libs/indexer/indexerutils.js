@@ -2,7 +2,6 @@
 
 import FileMetrics from "../fileutils/metrics";
 import FileSystemObject from "../fileutils/filesystemobject";
-import logger from "../logging/logger";
 
 export default {
 
@@ -34,7 +33,7 @@ export default {
      * @param {DirectoryInfo} dirInfo - The file system object to process.
      * @returns {ProcessInfo} The result of processing the directory.
      */
-    processDirectory(dirInfo) {
+    processDirectory(logger, dirInfo) {
         // list of file system objects to be sent to the database
         let processed = [];
 
@@ -42,10 +41,10 @@ export default {
         let continueQ = [];
 
         // start new profiler for this directory
-        let profiler = new FileMetrics();
+        let profiler = new FileMetrics(logger);
 
         // create a representation of the object
-        let ret = FileSystemObject.createFileSystemObject(dirInfo.name);
+        let ret = FileSystemObject.createFileSystemObject(logger, dirInfo.name);
         let fso = ret.fso;
         profiler.unknownCount += ret.unknown;
 
@@ -64,7 +63,7 @@ export default {
                 // otherwise, for each file in the directory...
                 for (let f of fso.files) {
                     // create the representation of the file
-                    let fileRet = FileSystemObject.createFileSystemObject(f);
+                    let fileRet = FileSystemObject.createFileSystemObject(logger, f);
                     let fileFso = fileRet.fso;
                     profiler.unknownCount += fileRet.unknown;
 
@@ -97,9 +96,6 @@ export default {
             // push file system object to process list
             processed.push(fsoAsObj);
         }
-
-        // finish processing directory
-        logger.debug(`Processed ${dirInfo.name}.`);
 
         // return information about the directory
         return {

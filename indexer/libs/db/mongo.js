@@ -1,10 +1,6 @@
-/** @module libs/mongo/mongo */
+/** @module libs/db/mongo */
 
-import logger from "../logging/logger";
 import mongodb from "mongodb";
-
-/** @constant {number} */
-const BUFFER_THRESHOLD = 2048;
 
 /** Class to manage interactions with a MongoDB server. */
 export default class Mongo {
@@ -38,20 +34,25 @@ export default class Mongo {
      * @param {number} port - The port number.
      * @param {string} name - The name of the database.
      * @param {number} poolSize - Number of connections in the connection pool.
+     * @param {number} [bufferThreshold=2048] - Maximum length of write operations buffer before sending.
+     * @param {bunyan.Logger} - The logger object for logging.
      * @param {onConnectSuccess} onSuccess - The callback to execute if the connection was successfully established.
      * @param {onConnectFail} onFail - The callback to execute if the connection could not be established.
      * @param {onConnectionClose} onExit - The callback to execute when the connection to the database closes.
      */
-    connectTo(server, port, name, poolSize, onSuccess, onFail, onExit) {
+    constructor(server, port, name, poolSize, bufferThreshold = 2048, logger, onSuccess, onFail, onExit) {
+        this._logger = logger;
+
         mongodb.MongoClient.connect(`mongodb://${server}:${port}/${name}`, { server: { poolSize } }, (error, db) => {
             if (error) {
-                logger.debug(error.toString());
+                this._logger.error(error);
                 onFail();
             }
 
             if (db) {
-                logger.debug("Successfully connected to the database.");
+                this._logger.debug("Successfully connected to the database");
 
+                this._bufferThreshold = bufferThreshold;
                 this._database = db;
                 this._writeBuffers = new Map();
                 this._outgoingCount = 0;
@@ -82,7 +83,7 @@ export default class Mongo {
             this._outgoingCount++;
             this._database.collection(collection).bulkWrite(buffer, (error, result) => {
                 if (error) {
-                    logger.error(error.toString());
+                    this._logger.info(error);
                 }
                 this._outgoingCount--;
 
@@ -93,6 +94,8 @@ export default class Mongo {
                 if (this._outgoingCount == 0 && this._readyToClose == true) {
                     // closes the connection to the database
                     this._database.close(() => {
+                        this._logger.debug("Successfully closed the connection to the database");
+
                         // execute a closing callback if one is set
                         if (this._closeCallback) {
                             this._closeCallback();
@@ -155,10 +158,11 @@ export default class Mongo {
             this._sendAllBuffersToDatabase(() => {
                 // signal that the connection is waiting to be closed
                 this._readyToClose = true;
+                this._logger.debug("Closing connection to the database...");
             });
             this._writeBuffers = null;
         } else {
-            logger.debug("There is no open connection to the database to close.");
+            this._logger.warn("Warning: There is no open connection to the database to close");
         }
     }
 
@@ -178,14 +182,15 @@ export default class Mongo {
         }
 
         // flush buffer if it has exceeded the threshold
-        if (this._writeBuffers.get(collection).length >= BUFFER_THRESHOLD) {
+        if (this._writeBuffers.get(collection).length >= this._bufferThreshold) {
+            this._logger.debug(`Flushing buffer ${collection} of size ${this._writeBuffers.get(collection).length}`);
             this._sendBufferToDatabase(this._writeBuffers.get(collection), collection, () => { });
             this._writeBuffers.set(collection, []);
         }
     }
 
     /**
-     * Buffers a new object or objects to be added to the databse.
+     * Buffers a new object or objects to be added to the database.
      * 
      * @author Jonathan Tan
      * @param {Object|Object[]} obj - The object, or an array of objects, to send to the database. The function assumes that objects are well-formatted.
@@ -193,16 +198,11 @@ export default class Mongo {
      */
     addToCollection(obj, collection) {
         if (this._database === undefined || this._database == null) {
-            logger.error("Error: Attempted to add to uninitialized database.");
+            this._logger.warn("Warning: Attempted to add to uninitialized database");
         } else {
-            if (Array.isArray(obj)) {
-                // add multiple insert operations to the queue
-                for (let doc of obj) {
-                    this._writeToCollection({ insertOne: { document: doc } }, collection);
-                }
-            } else {
+            for (let doc of obj) {
                 // add a single insert operation to the queue
-                this._writeToCollection({ insertOne: { document: obj } }, collection);
+                this._writeToCollection({ insertOne: { document: doc } }, collection);
             }
         }
     }

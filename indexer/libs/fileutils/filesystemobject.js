@@ -1,7 +1,6 @@
 /** @module libs/fileutils/filesystemobject */
 
 import fs from "fs";
-import logger from "../logging/logger";
 import os from "os";
 import path from "path"
 
@@ -56,10 +55,11 @@ export default class FileSystemObject {
      * 
      * @author Jonathan Tan
      * @static
+     * @param {bunyan.Logger} - The logger object for logging.
      * @param {string} filename - The file name of the object.
      * @returns {NewFileSystemObject} The representation of the object.
      */
-    static createFileSystemObject(filename) {
+    static createFileSystemObject(logger, filename) {
         // children files and directories that were unable to be read
         let unknown = 0;
 
@@ -81,7 +81,7 @@ export default class FileSystemObject {
                     // separate contained files into by whether they are a directory or not
                     for (let f of contained) {
                         try {
-                            let fFullpath = path.normalize(`${filename}${path.sep}${f}`);
+                            let fFullpath = path.join(filename, f);
                             let fStats = fs.lstatSync(fFullpath);
 
                             // add the files to the correct list
@@ -92,12 +92,12 @@ export default class FileSystemObject {
                             }
                         } catch (err) {
                             unknown++;
-                            logger.error(err.toString());
+                            logger.error(err);
                         }
                     }
                 } catch (err) {
                     unknown++;
-                    logger.error(err.toString());
+                    logger.error(err);
                 }
 
                 return { fso, unknown };
@@ -110,7 +110,7 @@ export default class FileSystemObject {
             }
         } catch (err) {
             unknown++;
-            logger.error(err.toString());
+            logger.error(err);
             return { fso: null, unknown };
         }
     }

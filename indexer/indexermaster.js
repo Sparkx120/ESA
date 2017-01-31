@@ -1,23 +1,27 @@
 import args from "./libs/args/argsmaster";
 import FileMetrics from "./libs/fileutils/metrics";
-import logger from "./libs/logging/logger";
-import Mongo from "./libs/mongo/mongo.js";
+import Json from "./libs/db/json.js";
+import Logger from "./libs/logging/logger";
+import Mongo from "./libs/db/mongo.js";
 import Parallel from "./libs/parallel/parallel.js";
 
 // get the command-line arguments
-const {root, server, port} = args;
+const {root, server, port, buffer, debug, verbose} = args;
+
+// create the logger
+const logger = new Logger(verbose).createLogger();
 
 // setup collection name to be the current timestamp
 const collection = new Date().toJSON();
 
 // create the profiler for the indexer
-const profiler = new FileMetrics();
+const profiler = new FileMetrics(logger);
 
 // create a map to accumulate file sizes
 const fileSizeMap = new Map();
 
 // create the worker process pool
-const workerPool = new Parallel("runworker.js", []);
+const workerPool = new Parallel("runworker.js", ["--verbose", verbose], logger);
 
 // add message handlers for the processes
 workerPool.addMessageHandler("continue", (item) => {
@@ -45,13 +49,17 @@ workerPool.addMessageHandler("process", (item) => {
     }
 
     // send only files returned to the database
-    mongo.addToCollection(item.filter((x) => { return !x.isFolder }), collection);
+    db.addToCollection(item.filter((x) => { return !x.isFolder }), collection);
 });
 workerPool.addMessageHandler("profile", (item) => {
     // accumlate metrics in profiler
     profiler.filesIndexed += item.files;
     profiler.directoriesIndexed += item.dirs;
     profiler.unknownCount += item.unknown;
+});
+workerPool.addMessageHandler("log", (item) => {
+    // log item from worker process
+    logger.debug(item);
 });
 
 // add idle behaviour to the worker pool
@@ -63,27 +71,42 @@ workerPool.onIdle(() => {
     workerPool.closeWorkerPool();
 
     // update folder sizes in aggregate map
+    logger.info("Aggregating folder sizes");
     for (let acc of fileSizeMap.values()) {
         acc.fso.size = acc.size;
     }
 
     // send all the folders to the database
-    mongo.addToCollection(Array.from(fileSizeMap.values(), (v) => { return v.fso; }), collection);
+    db.addToCollection(Array.from(fileSizeMap.values(), (v) => { return v.fso; }), collection);
+    logger.info("Aggregation complete");
 
     // close the database connection
-    mongo.close();
+    db.close();
 });
 
-// connect to MongoDB database server
-const mongo = new Mongo();
-mongo.connectTo(server, port, "esa", workerPool.maxPoolSize * 5, () => {
+// start the indexer
+let db;
+if (debug) {
+    // debug output
+    db = new Json(debug, logger, () => {
+        // output profiler metrics
+        profiler.logMetrics();
+    });
+
     // send root directory to the process pool
     logger.info(`Starting indexer from root: ${root}`);
     workerPool.sendToWorker([{ parent: null, name: root }]);
-}, () => {
-    logger.info("Unable to connect to the database server");
-    workerPool.closeWorkerPool();
-}, () => {
-    // output profiler metrics
-    profiler.logMetrics();
-});
+} else {
+    // database output
+    db = new Mongo(server, port, "esa", workerPool.maxPoolSize * 5, buffer, logger, () => {
+        // send root directory to the process pool
+        logger.info(`Starting indexer from root: ${root}`);
+        workerPool.sendToWorker([{ parent: null, name: root }]);
+    }, () => {
+        logger.info("Unable to connect to the database server");
+        workerPool.closeWorkerPool();
+    }, () => {
+        // output profiler metrics
+        profiler.logMetrics();
+    });
+}

@@ -1,7 +1,5 @@
 /** @module libs/fileutils/metrics */
 
-import logger from "../logging/logger";
-
 /** This class is used to keep track of various file-related metrics while processing. */
 export default class FileMetrics {
 
@@ -9,13 +7,16 @@ export default class FileMetrics {
      * Creates an instance of FileMetrics.
      * 
      * @author Jonathan Tan
+     * @param {bunyan.Logger} - The logger object for logging.
      */
-    constructor() {
+    constructor(logger) {
         this._filesIndexed = 0;
         this._directoriesIndexed = 0;
         this._unknownCount = 0;
 
         this._startTimer = process.hrtime();
+
+        this._logger = logger;
     }
 
     /**
@@ -24,12 +25,12 @@ export default class FileMetrics {
      * @author Jonathan Tan
      */
     logMetrics() {
-        logger.info(`# of files indexed: ${this._filesIndexed}`);
-        logger.info(`# of directories indexed: ${this._directoriesIndexed}`);
-        logger.info(`# of unknown files: ${this._unknownCount}`);
+        this._logger.info(`# of files indexed: ${this._filesIndexed}`);
+        this._logger.info(`# of directories indexed: ${this._directoriesIndexed}`);
+        this._logger.info(`# of unknown files: ${this._unknownCount}`);
 
         const endTimer = process.hrtime(this._startTimer);
-        logger.info(`Execution time: ${endTimer[0] + endTimer[1] / 1E9}s`);
+        this._logger.info(`Execution time: ${endTimer[0] + endTimer[1] / 1E9}s`);
     }
 
     /* setters and getters */

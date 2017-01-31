@@ -1,7 +1,11 @@
+import args from "./libs/args/argsworker";
 import indexer from "./libs/indexer/indexerutils";
 import fs from "fs";
-import logger from "./libs/logging/logger";
+import Logger from "./libs/logging/logger";
 import protocol from "./libs/parallel/protocol";
+
+// get the command-line arguments
+const {verbose} = args;
 
 /**
  * Takes a list of directory and sends back to the master the sub-directories and file metadata per directory
@@ -16,7 +20,8 @@ function processDirectories(dirs) {
 
     for (let dir of dirs) {
         // process the directory
-        let processed = indexer.processDirectory(dir);
+        let processed = indexer.processDirectory(logger, dir);
+        logger.debug(`Processed ${dir.name}`);
 
         // accumulate profiler metrics
         totalFiles += processed.filesProcessed;
@@ -44,6 +49,9 @@ function processDirectories(dirs) {
         profile: { files: totalFiles, dirs: totalDirs, unknown: totalUnknown }
     }));
 }
+
+// create the logger
+const logger = new Logger(verbose).createLogger();
 
 // create input stream on fd[3]
 const inputStream = fs.createReadStream(null, { fd: 3 });

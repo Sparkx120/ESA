@@ -1,7 +1,6 @@
 /** @module libs/parallel/parallel */
 
 import cp from "child_process";
-import logger from "../logging/logger";
 import MinHeap from "./minheap";
 import os from "os";
 import protocol from "./protocol";
@@ -14,11 +13,13 @@ export default class Parallel {
      * @author Jonathan Tan
      * @param {string} modulePath - The module to run in the worker process.
      * @param {string[]} args - List of string arguments.
+     * @param {bunyan.Logger} - The logger object for logging.
      * @param {number} [maxPoolSize=os.cpus().length-1] - The maximum number of workers that can be in the pool.
      * @param {number} [minPoolSize=1] - The minimum number of workers that should be in the pool.
      */
-    constructor(modulePath, args, maxPoolSize = os.cpus().length - 1, minPoolSize = 1) {
-        logger.debug("Creating the worker pool...")
+    constructor(modulePath, args, logger, maxPoolSize = os.cpus().length - 1, minPoolSize = 1) {
+        this._logger = logger;
+        this._logger.debug("Initializing the worker pool...");
 
         // apply pool size constraints
         this._minPoolSize = (minPoolSize > 0) ? minPoolSize : 1;
@@ -50,13 +51,14 @@ export default class Parallel {
      * @author Jonathan Tan
      */
     _addWorkerToPool() {
-        let opts = {
+        const opts = {
             // pipe fd[3] for output, fd[4] for input
             stdio: [process.stdin, process.stdout, process.stderr, "pipe", "pipe"]
         };
 
         // create the new worker process
         let newWorker = cp.spawn("node", [this._forkPath].concat(this._forkArgs), opts);
+        this._logger.debug(`Spawned new worker with pid ${newWorker.pid}`);
 
         // upon receiving data in input pipe from worker, process appropriately
         newWorker.stdio[4].on("data", (chunk) => {
@@ -183,7 +185,7 @@ export default class Parallel {
      * @author Jonathan Tan
      */
     closeWorkerPool() {
-        logger.debug("Closing the worker pool...")
+        this._logger.debug("Closing the worker pool");
 
         // even after all the hard work your workers have done, kill them all
         for (let [pid, worker] of this._workerHash.entries()) {
