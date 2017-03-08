@@ -1,6 +1,10 @@
 import React from "react";
 import { generateUUID } from "../utils.js"
 import { setResizeCallback } from "../../containers/callbackblock.jsx"
+
+const DEBUG = true;
+const DIV = true;
+
 /**
  * TreeMap Graph Component
  * @author James Wake
@@ -73,12 +77,31 @@ export default class TreeMap extends React.Component {
 
     render() {
         if(this.props.accordianScaling){
-            console.log("Scaling from split view detected");
+            if(DEBUG) console.log("Scaling from split view detected");
             this.componentResize();
         }
+        let DebugInfo = (<p></p>);
+        if(DEBUG){
+            DebugInfo = (<p>
+                    DataSize: {this.dataSize} <br/>
+                    Processing Time: {this.dataprocessingTime} <br/>
+                    Render Time: {this.renderTime} <br/>
+                </p>)
+        }
+
+        //Switch between SVG and DIV tag mode
+        let TreeMapOut = <svg id={this.state.id} className="treeMap"></svg>;
+        if(DIV){
+            TreeMapOut = <div id={this.state.id} className="treeMap"></div>;
+        }
+
+
         return(
             <div id={this.state.id + "-container"} className="treemap-container">
-                <svg id={this.state.id} width="100%" height="100%"></svg>
+                {TreeMapOut}
+                <div>
+                    {DebugInfo}
+                </div>
             </div>
         );
 	}
@@ -105,11 +128,12 @@ export default class TreeMap extends React.Component {
     }
 
     /**
-     * Sets up the TreeMap using the D3 Library
+     * Sets up the TreeMap Data using the D3 Library
      */
     renderTreeMap(dim, isUpdate){
-        console.log(this.state.size);
-        
+        if(DEBUG) console.log(this.state.size);
+        this.dataprocessingTime = Date.now();
+
         //Define Dimensions
         // var width = this.props.size.width,
         // height = this.props.size.height;
@@ -139,21 +163,54 @@ export default class TreeMap extends React.Component {
 
         //Json Data parser
         else if(this.props.type == "json"){
-            //Json Data
+            //Json Data Hierarchy Generator for ESA data
             this.d3.root = d3.hierarchy(this.props.data)
-                .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "/" : "") + d.data.id; })
+                .eachBefore((d)=>{ d.data.id = (d.parent ? d.parent.data.id + "/" : "") + d.data.id; })
                 .sum((d)=>{ if(d.children == null) return d.size; else return 0})
-                .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
-            //console.log(this.d3.root);
+                .sort((a, b)=>{ return b.height - a.height || b.value - a.value; });
         }
+
+        //Set dataSize (The number of nodes in the tree)
+        this.dataSize = 0;
+        this.d3.root.each((d)=>this.dataSize += 1);
 
         //Remove All Previous Nodes on Rerender (Functionality needs to be broken up)
         d3.select(`#${this.state.id}`)
             .selectAll("*").remove(); //This is not working right
 
-        //Generate the Treemap and Render it to the target div
+        this.dataprocessingTime = Date.now()-this.dataprocessingTime;
+        this.renderTime = Date.now();
+
+        //Render the Elements to the DOM
+        if(DIV){
+            if(isUpdate){
+                this.createDIVTree();
+                //this.updateDIVTree();
+            }
+            else{
+                this.createDIVTree();
+            }
+        }
+        else{
+            if(isUpdate){
+                this.createSVGTree();
+                //this.updateSVGTree();
+            }
+            else{
+                this.createSVGTree();
+            }
+        }
+
+        this.renderTime = Date.now()-this.renderTime;
+        if(DEBUG) console.log(this.dataprocessingTime, this.renderTime, this.dataSize);
+    }
+
+    /**
+     * Generate the Treemap as an SVG on the DOM in the target div
+     */
+    createSVGTree(){
         this.d3.treemap(this.d3.root);
-        console.log(this.d3);
+        if(DEBUG) console.log(this.d3);
         let g = d3.select(`#${this.state.id}`)
             .selectAll(".node")
             .data(this.d3.root.leaves())
@@ -180,7 +237,7 @@ export default class TreeMap extends React.Component {
             .attr("class", "node-label")
 	        .attr("x", (d)=>{return 2;})
 	        .attr("y", (d)=>{return 14;})
-            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n");})
+            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
         //Box Size Text
         clip.append("text")
             .attr("class", "node-value")
@@ -190,17 +247,69 @@ export default class TreeMap extends React.Component {
         //Tool Tip
         g.append("svg:title")
             .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
-        // let c = d3.select(`#${this.state.id}`)
-        //     .selectAll(".node")
-        //     .data(this.d3.root.children)
-        //     .enter().append("g");
-        // let box2 = c.append("rect")
-        //     .attr("title", (d)=>{ return d.id + "\n" + this.d3.format(d.value); })
-        //     .attr("x", (d)=>{ return d.x0; })
-        //     .attr("y", (d)=>{ return d.y0; })
-        //     .attr("width", (d)=>{ return d.x1 - d.x0; })
-        //     .attr("height", (d)=>{ return d.y1 - d.y0; })
-        //     .style("fill", (d)=>{ while (d.depth > 1) d = d.parent; return this.d3.color(d.id); })
-	    //     .style("stroke", "white" /*"transparent"*/)
+    }
+
+    //Non Working Direct Update
+    updateSVGTree(){
+        d3.select(`#${this.state.id}`)
+            .selectAll(".node")
+            .data(this.d3.root.leaves())
+            .attr("x", (d)=>{ return d.x0; })
+            .attr("y", (d)=>{ return d.y0; })
+            .attr("width", (d)=>{ return d.x1 - d.x0; })
+            .attr("height", (d)=>{ return d.y1 - d.y0; })
+
+        d3.select(`#${this.state.id}`)
+            .selectAll(".node-value")
+            .data(this.d3.root.leaves())
+            .attr("x", (d)=>{return 2;})
+            .attr("y", (d)=>{return d.y1 - d.y0 - 6;})    
+    }
+
+    //Generate the Treemap as a DIV Tree on the DOM in the target div
+    createDIVTree(){
+        this.d3.treemap(this.d3.root);
+        let divSelection = d3.select(`#${this.state.id}`)
+            .selectAll(".node")
+            .data(this.d3.root.leaves())
+        
+        //Treemap Boxes
+        let bW = 0.5;
+        let box = divSelection.enter().append("div").attr("class", "node")
+            .attr("title", (d)=>{ return d.data.path + "\n" + this.d3.format(d.value); }) //Tooltip
+            .style("left", (d) => { return d.x0 + "px"; })
+            .style("top", (d) => { return d.y0 + "px"; })
+            .style("width", (d) => { if(d.x1 - d.x0 - 2*bW>0) return d.x1 - d.x0 - 2*bW + "px"; else return "0px"; })
+            .style("height", (d) => { if(d.y1 - d.y0 - 2*bW>0) return d.y1 - d.y0 - 2*bW  + "px"; else return "0px" })
+            .style("background", (d) => {while (d.depth > 2) d = d.parent; return this.d3.color(d.value); })
+            .style("border", ""+ bW +" white");
+        //Title
+        box.append("div")
+            .attr("class", "node-label")
+            .text((d) => { if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
+        //Value
+        box.append("div")
+            .attr("class", "node-value")
+            .style("left", (d)=>4)
+            .style("top", (d)=>{return d.y1 - d.y0 - 40;})
+            .text((d) => { return this.d3.format(d.value); });
+    }
+
+    //Non Working Direct Update
+    updateDIVTree(){
+        let bW = 0.5;
+        d3.select(`#${this.state.id}`)
+            .selectAll(".node")
+            .data(this.d3.root.leaves())
+            .style("left", (d) => { return d.x0 + "px"; })
+            .style("top", (d) => { return d.y0 + "px"; })
+            .style("width", (d) => { if(d.x1 - d.x0 - 2*bW>0) return d.x1 - d.x0 - 2*bW + "px"; else return "0px"; })
+            .style("height", (d) => { if(d.y1 - d.y0 - 2*bW>0) return d.y1 - d.y0 - 2*bW  + "px"; else return "0px" })
+        
+        d3.select(`#${this.state.id}`)
+            .selectAll(".node-value")
+            .data(this.d3.root.leaves())
+            .style("left", (d)=>4)
+            .style("top", (d)=>{return d.y1 - d.y0 - 40;})
     }
 };
