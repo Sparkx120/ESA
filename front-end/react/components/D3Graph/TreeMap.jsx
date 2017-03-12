@@ -70,6 +70,10 @@ export default class TreeMap extends React.Component {
         }, 20);
     }
 
+    componentWillReceiveProps(nextProps){
+        this.renderTreeMap(null, true, nextProps);
+    }
+
     configureResizeCallback(){
         //Update with compositable code
         setResizeCallback(this.state.id, ()=>{this.componentResize()});
@@ -130,9 +134,12 @@ export default class TreeMap extends React.Component {
     /**
      * Sets up the TreeMap Data using the D3 Library
      */
-    renderTreeMap(dim, isUpdate){
+    renderTreeMap(dim, isUpdate, nextProps){
         if(DEBUG) console.log(this.state.size);
         this.dataprocessingTime = Date.now();
+
+        let type = nextProps ? nextProps.type : this.props.type;
+        let data = nextProps ? nextProps.data : this.props.data;
 
         //Define Dimensions
         // var width = this.props.size.width,
@@ -151,9 +158,9 @@ export default class TreeMap extends React.Component {
             .round(true);
         
         //CSV Parser
-        if(this.props.type == "csv"){
+        if(type == "csv"){
             //Parse the csvData into d3 format
-            this.d3.data = d3.csvParse(this.props.data, (d)=>{d.value = +d.value;return d;});
+            this.d3.data = d3.csvParse(data, (d)=>{d.value = +d.value;return d;});
             
             //Stratify the Data using the Stratification Funciton
             this.d3.root = this.d3.stratify(this.d3.data)
@@ -162,11 +169,11 @@ export default class TreeMap extends React.Component {
         }
 
         //Json Data parser
-        else if(this.props.type == "json"){
+        else if(type == "json"){
             //Json Data Hierarchy Generator for ESA data
-            this.d3.root = d3.hierarchy(this.props.data)
+            this.d3.root = d3.hierarchy(data)
                 .eachBefore((d)=>{ d.data.id = (d.parent ? d.parent.data.id + "/" : "") + d.data.id; })
-                .sum((d)=>{ if(d.children == null) return d.size; else return 0})
+                .sum((d)=>{ if(d.size) return d.size; else return 0})
                 .sort((a, b)=>{ return b.height - a.height || b.value - a.value; });
         }
 
@@ -184,20 +191,20 @@ export default class TreeMap extends React.Component {
         //Render the Elements to the DOM
         if(DIV){
             if(isUpdate){
-                this.createDIVTree();
+                this.createDIVTree(nextProps);
                 //this.updateDIVTree();
             }
             else{
-                this.createDIVTree();
+                this.createDIVTree(nextProps);
             }
         }
         else{
             if(isUpdate){
-                this.createSVGTree();
+                this.createSVGTree(nextProps);
                 //this.updateSVGTree();
             }
             else{
-                this.createSVGTree();
+                this.createSVGTree(nextProps);
             }
         }
 
@@ -208,7 +215,9 @@ export default class TreeMap extends React.Component {
     /**
      * Generate the Treemap as an SVG on the DOM in the target div
      */
-    createSVGTree(){
+    createSVGTree(nextProps){
+        let type = nextProps ? nextProps.type : this.props.type;
+
         this.d3.treemap(this.d3.root);
         if(DEBUG) console.log(this.d3);
         let g = d3.select(`#${this.state.id}`)
@@ -237,7 +246,7 @@ export default class TreeMap extends React.Component {
             .attr("class", "node-label")
 	        .attr("x", (d)=>{return 2;})
 	        .attr("y", (d)=>{return 14;})
-            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
+            .text((d)=>{ if(type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
         //Box Size Text
         clip.append("text")
             .attr("class", "node-value")
@@ -246,11 +255,13 @@ export default class TreeMap extends React.Component {
             .text((d)=>{ return this.d3.format(d.value); });
         //Tool Tip
         g.append("svg:title")
-            .text((d)=>{ if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
+            .text((d)=>{ if(type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
     }
 
     //Non Working Direct Update
-    updateSVGTree(){
+    updateSVGTree(nextProps){
+        let type = nextProps ? nextProps.type : this.props.type;
+
         d3.select(`#${this.state.id}`)
             .selectAll(".node")
             .data(this.d3.root.leaves())
@@ -267,7 +278,9 @@ export default class TreeMap extends React.Component {
     }
 
     //Generate the Treemap as a DIV Tree on the DOM in the target div
-    createDIVTree(){
+    createDIVTree(nextProps){
+        let type = nextProps ? nextProps.type : this.props.type;
+
         this.d3.treemap(this.d3.root);
         let divSelection = d3.select(`#${this.state.id}`)
             .selectAll(".node")
@@ -282,11 +295,14 @@ export default class TreeMap extends React.Component {
             .style("width", (d) => { if(d.x1 - d.x0 - 2*bW>0) return d.x1 - d.x0 - 2*bW + "px"; else return "0px"; })
             .style("height", (d) => { if(d.y1 - d.y0 - 2*bW>0) return d.y1 - d.y0 - 2*bW  + "px"; else return "0px" })
             .style("background", (d) => {while (d.depth > 2) d = d.parent; return this.d3.color(d.value); })
-            .style("border", ""+ bW +" white");
+            .style("border", ""+ bW +" white")
+            .on("click", (elem)=>{
+                this.props.updateRoot(elem);
+            });
         //Title
         box.append("div")
             .attr("class", "node-label")
-            .text((d) => { if(this.props.type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
+            .text((d) => { if(type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
         //Value
         box.append("div")
             .attr("class", "node-value")
@@ -296,7 +312,7 @@ export default class TreeMap extends React.Component {
     }
 
     //Non Working Direct Update
-    updateDIVTree(){
+    updateDIVTree(nextProps){
         let bW = 0.5;
         d3.select(`#${this.state.id}`)
             .selectAll(".node")
