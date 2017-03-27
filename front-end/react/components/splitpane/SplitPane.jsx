@@ -253,7 +253,7 @@ class SplitPane extends Component {
                 >
                     {
                         typeof children[0] !== 'string' && React.Component.prototype.isPrototypeOf((children[0].type).prototype) ?
-                            React.cloneElement(children[0], { accordianScaling: this.state.active | this.props.accordianScaling }) :
+                            React.cloneElement(children[0], { accordionScaling: this.state.active | this.props.accordionScaling }) :
                             children[0]
                     }
                 </Pane>
@@ -283,7 +283,7 @@ class SplitPane extends Component {
                 >
                     {
                         typeof children[1] !== 'string' && React.Component.prototype.isPrototypeOf((children[1].type).prototype) ?
-                            React.cloneElement(children[1], { accordianScaling: this.state.active | this.props.accordianScaling }) :
+                            React.cloneElement(children[1], { accordionScaling: this.state.active | this.props.accordionScaling }) :
                             children[1]
                     }
                 </Pane>

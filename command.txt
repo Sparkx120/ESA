@@ -1,0 +1,10 @@
+node run.js --server 127.0.0.1 --root e:/
+
+
+Back-end: 
+1. go to front-end folder
+2. run npm run mongo
+Front-end:
+1. go to front-end folder
+2. run npm run dev
+

@@ -29,7 +29,7 @@ class Resizer extends Component {
                     event.preventDefault();
                     this.props.onTouchEnd(event);
                 }}
-            ><FaAngleDoubleLeft/><p ref='PaneName' className='vertical-text'>FileSystem</p></span>
+            ><FaAngleDoubleLeft/><p ref='PaneName' className='vertical-text'>ESA</p></span>
         );
     }
 }

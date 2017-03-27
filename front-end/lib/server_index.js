@@ -5,8 +5,8 @@ import compression from "compression";
 import socketio from "socket.io";
 import logger from "./logger.js";
 import opts from "./opts.js";
-import Handle from './socketHandle.js';
-import treemap from './treemap.js';
+import Handle from './socket/socketHandle.js';
+import treemap from './socket/treemap.js';
 
 //Configure Options and Logger
 const {port, bind} = opts;

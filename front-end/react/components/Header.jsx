@@ -26,7 +26,7 @@ class Header extends React.Component {
             </div>
             <ul className="navbar-right">
                                 
-                  <Menu className="usericon">
+                  {/*<Menu className="usericon">
                      <MenuTrigger className='dropdown'>
                         <Link className="username">User</Link>
                         <FaUser/>
@@ -36,7 +36,7 @@ class Header extends React.Component {
                             <MenuOption><FaCog/> setting</MenuOption>
                             <MenuOption><FaSignOut/> sign out</MenuOption>
                         </MenuOptions>
-                  </Menu>
+                  </Menu>*/}
             </ul>
             </nav>
         );

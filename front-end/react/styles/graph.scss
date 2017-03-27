@@ -1,9 +1,12 @@
-#graphs{
+.graphs{
     min-width: 300px;
+    height: calc(100vh - 50px);
     margin-left: 5px;
     margin-right: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
-#graph-box{
+.graph-box{
     display: block;
     width: 100%;
     height: 76%;

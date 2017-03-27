@@ -1,11 +1,7 @@
 import React from 'react';
-// import Home from './Pages/Home.jsx';
 import Header from './Header.jsx';
-// import SplitPane from './splitpane/SplitPane.js';
+import scss from '../styles/style.scss';
 
-
-import Accordion from './Accordion.jsx';
-import scss from '../styles/style.scss'; 
 /**
  * Root Application Container 
  * @author James Wake
@@ -19,7 +15,6 @@ export default class App extends React.Component {
         return(
             <div id="wrapper" className='root'>
                 <Header/>
-               {/* <Accordion/> */}
                {this.props.children}
              {/* default page from RouteIndex in index.jsx;
                  Welcome.jsx in this case*/}

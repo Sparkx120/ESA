@@ -1,47 +1,24 @@
 import React from 'react';
 import socket from '../../socket.js'
-import TreeMap from '../D3Graph/TreeMap.jsx'
-import { csvData } from '../D3Graph/testData.js'
+import TreeMapControl from '../D3Graph/TreeMapControl.jsx';
+import Style from '../../styles/graph.scss';
 
-class Graphs extends React.Component{
-     //React Constructor
-    constructor(...args){
-        super(...args);
-        this.state = {
-            "home": "",
-        }
-    }
-    //React on Mount
-    componentDidMount(){
-        socket.on("home", (data)=>{
-            this.setState({"home": data});
-        });
-        socket.emit("home");
-
-        //Test for Graph rerender speed
-        // this.interval = setInterval(()=>{
-        //     let newHeight = this.state.graphHeight - 1;
-        //     if(newHeight < 500) newHeight = 1060;
-        //     this.setState({graphHeight: newHeight});
-            
-        // },20)
-    }
-    //React on Unmount
-    componentWillUnmount(){
-        socket.off("home");
-        // clearInterval(this.interval);
-    }
+/**
+ * Graphs Container Component
+ * Converts Root to TreeMapControls
+ * @author James Wake
+ * @class Graphs
+ */
+export default class Graphs extends React.Component{
     render(){
         return(
-            <div id="graphs">
-                <h2>Graphs</h2>
+            <div className="graphs">
+                <h2>Graph</h2>
                 <hr/>
-                <div id="graph-box">
-                    <h3>{this.state.home}</h3>
-                    <TreeMap accordianScaling={this.props.accordianScaling} type="csv" data={csvData} className="treeMap"/>
+                <div>
+                    <TreeMapControl accordionScaling={this.props.accordionScaling} state={this.props.state} action={this.props.action} type="json" className="treeMap"/>
                 </div>
             </div>
         )
     }
 }
-export default Graphs;

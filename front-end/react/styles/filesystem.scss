@@ -1,7 +1,10 @@
 #fileSys{
     min-width: 300px;
+    height: calc(100vh - 50px);
     margin-left: 5px;
     margin-right: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 //input box for directory
@@ -39,6 +42,13 @@
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 
+.filename{
+    display: inline-block;
+    width: 250px;
+    height: 30px;
+    margin-left: 50px;
+}
+
 .input-group-addon {
     padding: 6px 12px;
     font-size: 14px;
@@ -54,16 +64,17 @@
     vertical-align: middle;
 }
 
-//status
-.status-box{
+//filter
+#filter-box{
     display: block;
+    // vertical-align: middle;
     width: 100%;
-    height: 50%;
-    padding: 6px 12px;
-    font-size: 14px;
+    height: 190px;
+    padding: 4px 12px;
+    font-size: 1.2em;
     line-height: 1.42857143;
     color: #555;
-    background-color: #fff;
+    background-color: #ddd;
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -76,22 +87,228 @@
 
 .filter-opt{
     display: inline-block;
+    padding-top: 10px;
+    padding-left: 10px;
 }
 
-.hide{
-    display: none;
-
+ul{
+    text-decoration: none;
+    padding-left: 0px;
 }
 
-.show-more-options{
-    position: relative;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    background: #FFF;
-    // left: 0;
-    // float: left;
+.opt-table{
+    border: none;
 }
 
 .react-datepicker-ignore-onclickoutside{
     display: inherit;
+}
+
+
+//status
+.status-box{
+    display: block;
+    width: 100%;
+    height: 50%;;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ddd;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: auto;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.file-info{
+    display: block;
+    width: 100%;
+    height: 30px;;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #bbb;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.subfolder{
+    margin-top: 8px;
+}
+
+
+
+//calendar
+.filter-calendar{
+    display: inline-block;
+    padding-left: 50px;
+}
+.input-calendar {
+  font-family: 'Pontano Sans', sans-serif;
+  position: relative;
+//   display: inline-block;
+}
+
+.input-calendar-wrapper {
+  position: absolute;
+  padding: 5px 12px;
+  border: 1px solid #c4c4c4;
+  border-radius: 5px;
+  box-shadow: 0 0 9px 5px rgba(0,0,0,0.05);
+  background-color: #fff;
+  text-align: center;
+  left: 140px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 5;
+}
+
+.input-calendar .input-calendar-field {
+  width: 120px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: 'Pontano Sans', sans-serif;
+  font-size: 16px;
+  padding: 2px 8px;
+}
+
+.input-calendar .input-calendar-field:focus {
+  outline: none;
+  border: 1px solid #f39c12;
+}
+
+.input-calendar .calendar-icon {
+  display: inline-block;
+  padding: 0px 1px 0 5px;
+  height: 27px;
+  line-height: 27px;
+  transform: translateY(4px);
+  cursor: pointer;
+}
+
+.input-calendar .days,
+.input-calendar .months,
+.input-calendar .years {
+  width: 189px;
+  padding-bottom: 2px;
+}
+
+.input-calendar .cell {
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #fff;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.input-calendar .cell:hover {
+  color: #f39c12;
+  border: 1px solid #f39c12;
+  border-radius: 4px;
+}
+
+.input-calendar .cell.current {
+  background: #f39c12;
+  color: #fff;
+  border-radius: 4px;
+  opacity: .8;
+}
+
+.input-calendar .day {
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+}
+
+.input-calendar .day.prev,
+.input-calendar .day.next {
+  opacity: .4;
+}
+
+.input-calendar .month {
+  width: 58px;
+  height: 38px;
+  line-height: 38px;
+}
+
+.input-calendar .year {
+  width: 58px;
+  height: 38px;
+  line-height: 38px;
+}
+
+.input-calendar .days-title .cell {
+  height: 25px;
+  line-height: 28px;
+  opacity: 0.5;
+  cursor: default;
+}
+
+.input-calendar .days-title .cell:hover {
+  color: #000;
+  border: 1px solid #fff;
+}
+
+.input-calendar .navigation-title {
+  width: 100px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.input-calendar .years-view .navigation-title {
+  cursor: default;
+}
+
+.input-calendar .years-view .navigation-title:hover {
+  color: #000;
+}
+
+.input-calendar .navigation-title:hover {
+  color: #f39c12;
+}
+
+.input-calendar .icon-wrapper {
+  cursor: pointer;
+}
+
+.input-calendar .icon:hover,
+.input-calendar .today-btn:hover,
+.input-calendar .icon-wrapper:hover {
+  color: #f39c12;
+}
+
+.input-calendar .icon {
+  cursor: pointer;
+  width: 20px;
+}
+
+.input-calendar .today-btn {
+  cursor: pointer;
+}
+
+.input-calendar .cell.day.today {
+  position: relative;
+}
+
+.input-calendar .cell.day.today:after {
+  content: '.';
+  position: absolute;
+  bottom: 15px;
+  font-size: 20px;
+  color: #F39C12;
 }

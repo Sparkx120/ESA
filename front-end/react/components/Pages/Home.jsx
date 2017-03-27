@@ -1,6 +1,6 @@
 import React from 'react';
 import socket from '../../socket.js'
-import TreeMap from '../D3Graph/TreeMap.jsx'
+import TreeMapControl from '../D3Graph/TreeMapControl.jsx'
 import { miniJsonFiles, jsonFile, jsonFiles2, jsonFiles3 } from "../D3Graph/testData.js"
 
 /**
@@ -13,19 +13,17 @@ export default class Home extends React.Component {
     constructor(...args){
         super(...args);
         this.state = {
-            "home": "",
-            "tree": miniJsonFiles
+            home: "",
+            tree: null,
+            dataStack: []
         }
     }
     //React on Mount
     componentDidMount(){
-        socket.on("home", (data)=>{
-            this.setState({"home": data});
-        });
-        socket.emit("home");
         socket.on('treemap', (data)=>{
             console.log("Recieving Tree: ", data);
-            this.setState({"tree": data});
+            this.setState({dataStack: [data]});
+            socket.off('treemap');
         });
         socket.emit('treemap', {collection: null, root: null});
 
@@ -37,27 +35,33 @@ export default class Home extends React.Component {
             
         // },20)
     }
-    //React on Unmount
-    componentWillUnmount(){
-        socket.off("home");
-        // clearInterval(this.interval);
-    }
 
     updateRoot(elem){
-        //console.log(elem);
+        this.setState({tree: null})
         socket.on('treemap', (data)=>{
             console.log("Recieving Tree: ", data);
-            this.setState({"tree": data});
+            
+            //Back Stack
+            let localStack = this.state.dataStack;
+            localStack.push(data);
+
+            //Set State
+            this.setState({dataStack: localStack});
             socket.off('treemap');
         });
         socket.emit('treemap', {collection: null, root: elem.data.path});
     }
 
+    upRoot(){
+        let localStack = this.state.dataStack;
+        localStack.pop();
+        this.setState({dataStack: localStack});
+    }
+
     render() {
         return(
             <div className="PageContainer">
-                <h1>{this.state.home}</h1>
-                <TreeMap data={this.state.tree} updateRoot={this.updateRoot} type="json" className="treeMap"/>
+                <TreeMapControl dataHeight={this.state.dataStack.length} data={this.state.dataStack[this.state.dataStack.length-1]} updateRoot={this.updateRoot.bind(this)} upRoot={this.upRoot.bind(this)} type="json" className="treeMap"/>
             </div>
         );
 	}

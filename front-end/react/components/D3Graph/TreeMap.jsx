@@ -1,14 +1,21 @@
 import React from "react";
 import { generateUUID } from "../utils.js"
-import { setResizeCallback } from "../../containers/callbackblock.jsx"
+import { setResizeCallback,
+         deleteResizeCallback } from "../../containers/callbackblock.jsx"
 
-const DEBUG = true;
+import { handleFilters, isFiltering } from "../../filters/filters.jsx"
+
+const DEBUG = false;
 const DIV = true;
+
+//Used for FileType Highlight colorMode
+const HIGHLIGHT = "rgba(189,188,34,0.6)";
+const BACKGROUND = "rgba(127,127,127,0.6)";
 
 /**
  * TreeMap Graph Component
  * @author James Wake
- * @class App
+ * @class TreeMap
  */
 export default class TreeMap extends React.Component {
 
@@ -32,6 +39,7 @@ export default class TreeMap extends React.Component {
 
     /**
      * Get the dimensions of the current containing div
+     * @class TreeMap
      */
     getComponentDimensions(){
         //Use a square box representation with a 1x1 factor then resize to fit in the next phase using div.clientWidth
@@ -44,6 +52,7 @@ export default class TreeMap extends React.Component {
     }
 
     componentDidMount(){
+        // debugger;
         let dim = this.getComponentDimensions();
         this.setState({size: dim});
         this.setupBaseD3();
@@ -52,11 +61,13 @@ export default class TreeMap extends React.Component {
     }
 
     componentWillUnmount(){
-        setResizeCallback(this.state.id, ()=>{});
+        //setResizeCallback(this.state.id, ()=>{});
+        deleteResizeCallback(this.state.id);
     }
 
     /**
      * On Resize callback for TreeMap
+     * @class TreeMap
      */
     componentResize(){
         if(this.timeout){
@@ -74,13 +85,17 @@ export default class TreeMap extends React.Component {
         this.renderTreeMap(null, true, nextProps);
     }
 
+    /**
+     * Configure the Resize Callback
+     * @class TreeMap
+     */
     configureResizeCallback(){
         //Update with compositable code
         setResizeCallback(this.state.id, ()=>{this.componentResize()});
     }
 
     render() {
-        if(this.props.accordianScaling){
+        if(this.props.accordionScaling){
             if(DEBUG) console.log("Scaling from split view detected");
             this.componentResize();
         }
@@ -101,7 +116,7 @@ export default class TreeMap extends React.Component {
 
 
         return(
-            <div id={this.state.id + "-container"} className="treemap-container">
+            <div id={this.state.id + "-container"} className="treemapContainer">
                 {TreeMapOut}
                 <div>
                     {DebugInfo}
@@ -112,6 +127,7 @@ export default class TreeMap extends React.Component {
 
     /**
      * Setup basic d3 functions that do not need size or data
+     * @class TreeMap
      */
     setupBaseD3(){
         //D3 Format
@@ -138,6 +154,7 @@ export default class TreeMap extends React.Component {
         if(DEBUG) console.log(this.state.size);
         this.dataprocessingTime = Date.now();
 
+        //Handle Props Updates
         let type = nextProps ? nextProps.type : this.props.type;
         let data = nextProps ? nextProps.data : this.props.data;
 
@@ -175,6 +192,10 @@ export default class TreeMap extends React.Component {
                 .eachBefore((d)=>{ d.data.id = (d.parent ? d.parent.data.id + "/" : "") + d.data.id; })
                 .sum((d)=>{ if(d.size) return d.size; else return 0})
                 .sort((a, b)=>{ return b.height - a.height || b.value - a.value; });
+               
+                // console.log("hahaha");
+                // console.log(this.d3.root);
+                // console.log("hehehe");
         }
 
         //Set dataSize (The number of nodes in the tree)
@@ -192,7 +213,7 @@ export default class TreeMap extends React.Component {
         if(DIV){
             if(isUpdate){
                 this.createDIVTree(nextProps);
-                //this.updateDIVTree();
+                //this.updateDIVTree(); //Not working quite right
             }
             else{
                 this.createDIVTree(nextProps);
@@ -201,7 +222,7 @@ export default class TreeMap extends React.Component {
         else{
             if(isUpdate){
                 this.createSVGTree(nextProps);
-                //this.updateSVGTree();
+                //this.updateSVGTree(); //Not working quite right
             }
             else{
                 this.createSVGTree(nextProps);
@@ -214,6 +235,8 @@ export default class TreeMap extends React.Component {
 
     /**
      * Generate the Treemap as an SVG on the DOM in the target div
+     * @class TreeMap
+     * @param {Object} nextProps
      */
     createSVGTree(nextProps){
         let type = nextProps ? nextProps.type : this.props.type;
@@ -258,7 +281,11 @@ export default class TreeMap extends React.Component {
             .text((d)=>{ if(type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n") + "\n" + this.d3.format(d.value);})
     }
 
-    //Non Working Direct Update
+    /**
+     * Update an SVG TreeMap Tree with updated nodes
+     * @class TreeMap
+     * @param {Object} nextProps 
+     */
     updateSVGTree(nextProps){
         let type = nextProps ? nextProps.type : this.props.type;
 
@@ -277,10 +304,14 @@ export default class TreeMap extends React.Component {
             .attr("y", (d)=>{return d.y1 - d.y0 - 6;})    
     }
 
-    //Generate the Treemap as a DIV Tree on the DOM in the target div
+    /**
+     * Create a DIV TreeMap
+     * @class TreeMap
+     * @param {Object} nextProps
+     */
     createDIVTree(nextProps){
         let type = nextProps ? nextProps.type : this.props.type;
-
+        
         this.d3.treemap(this.d3.root);
         let divSelection = d3.select(`#${this.state.id}`)
             .selectAll(".node")
@@ -294,24 +325,37 @@ export default class TreeMap extends React.Component {
             .style("top", (d) => { return d.y0 + "px"; })
             .style("width", (d) => { if(d.x1 - d.x0 - 2*bW>0) return d.x1 - d.x0 - 2*bW + "px"; else return "0px"; })
             .style("height", (d) => { if(d.y1 - d.y0 - 2*bW>0) return d.y1 - d.y0 - 2*bW  + "px"; else return "0px" })
-            .style("background", (d) => {while (d.depth > 2) d = d.parent; return this.d3.color(d.value); })
+            //Color Handler
+            .style("background", (d) => {return this.colorize(d,nextProps ? nextProps : this.props)})
             .style("border", ""+ bW +" white")
             .on("click", (elem)=>{
-                this.props.updateRoot(elem);
+                if(elem.data.isFolder){
+                    this.props.updateRoot(elem);
+                }else{
+                    this.props.updateRoot({data:{path:elem.parent.data.path}});
+                }
+                
             });
+            // .on("contextmenu", (elem)=>{
+            //     this.props.upRoot()
+            // });
         //Title
         box.append("div")
             .attr("class", "node-label")
-            .text((d) => { if(type=="json") return d.data.path; else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
+            .text((d) => { if(type=="json") return d.data.path.substring(d.parent ? d.parent.data.path.length : 0); else return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g).join("\n"); })
         //Value
         box.append("div")
             .attr("class", "node-value")
             .style("left", (d)=>4)
             .style("top", (d)=>{return d.y1 - d.y0 - 40;})
-            .text((d) => { return this.d3.format(d.value); });
+            .text((d) => { let size = Math.floor(d.value/1000000); return size + " MB"; });
     }
 
-    //Non Working Direct Update
+    /**
+     * Update a DIV TreeMap Tree with updated nodes
+     * @class TreeMap
+     * @param {Object} nextProps 
+     */
     updateDIVTree(nextProps){
         let bW = 0.5;
         d3.select(`#${this.state.id}`)
@@ -327,5 +371,65 @@ export default class TreeMap extends React.Component {
             .data(this.d3.root.leaves())
             .style("left", (d)=>4)
             .style("top", (d)=>{return d.y1 - d.y0 - 40;})
+    }
+
+    /**
+     * Colorize a tile in the treemap based on its d3 component and the nextProps colorMode
+     * @param {Object} d 
+     * @param {Object} nextProps 
+     */
+    colorize(d, nextProps){
+        let color = nextProps ? nextProps.state.colorMode : {depth:{set:true}};
+        let filters = nextProps ? nextProps.state.filters : null;
+        // console.log(color, nextProps, color.depth.set);
+
+        if(filters && isFiltering(filters)){
+            if(handleFilters(filters, d.data)){
+                return HIGHLIGHT;
+            }
+            else{
+                return BACKGROUND;
+            }
+            // let size = d.data.size;
+            // if(d.data.folderSize){
+            //     size = d.data.folderSize;
+            // }
+            // //console.log(parseInt(size) > parseInt(filters.size.value)*1000000, parseInt(filters.size.value), filters.size.value)
+            // if(parseInt(size) > filters.size.value*1000000){
+            //     return HIGHLIGHT;
+            // }
+            // else{
+            //     return BACKGROUND;
+            // }
+        }
+
+        //Handle Color Modes
+        if(color.depth.set){
+            // console.log("This was done");
+            while (d.depth > 2) d = d.parent;
+            return this.d3.color(d.value); 
+        }
+        if(color.fileType.set){
+            //console.log(d);
+            try{
+                let regex = new RegExp(color.fileType.value);
+                // console.log(d);
+                if(regex.exec(d.data.path)){
+                    return HIGHLIGHT;
+                }
+                else{
+                    return BACKGROUND;
+                }
+            }catch(e){
+                // console.log(e);
+                return BACKGROUND;
+            }
+            
+        }
+        if(color.serverConfig){
+                //Not implemented
+        }
+
+        return "rgba(0,0,0,1)"; //ERROR IF YOU GET THIS
     }
 };
