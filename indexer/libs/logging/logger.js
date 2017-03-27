@@ -1,44 +1,24 @@
 /** @module libs/logging/logger */
 
+import args from "../args/argsmaster";
 import bunyan from "bunyan";
 
-/** Class used for logging messages. */
-export default class Logger {
+let config = {
+    name: "esa",
+    streams: []
+};
 
-    /**
-     * Creates an instance of Logger.
-     * 
-     * @author Jonathan Tan
-     * @param {boolean} verbose - The verbosity of logging.
-     */
-    constructor(verbose) {
-        // base logging configuration
-        this._config = {
-            name: "esa",
-            streams: []
-        };
-
-        // specify verbosity
-        if (verbose == true) {
-            this._config.streams.push({
-                level: "debug",
-                stream: process.stdout
-            });
-        } else {
-            this._config.streams.push({
-                level: "info",
-                stream: process.stdout
-            });
-        }
-    }
-
-    /**
-     * Constructs a logger object.
-     * 
-     * @author Jonathan Tan
-     * @returns {bunyan.Logger} A logger object.
-     */
-    createLogger() {
-        return bunyan.createLogger(this._config);
-    }
+// specify verbosity
+if (args.verbose == true) {
+    config.streams.push({
+        level: "debug",
+        stream: process.stdout
+    });
+} else {
+    config.streams.push({
+        level: "info",
+        stream: process.stdout
+    });
 }
+
+export default bunyan.createLogger(config);

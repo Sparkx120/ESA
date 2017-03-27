@@ -1,13 +1,12 @@
 /** @module libs/indexer/indexerutils */
 
-import FileMetrics from "../fileutils/metrics";
 import FileSystemObject from "../fileutils/filesystemobject";
 
 export default {
 
     /**
      * Information that can be combined to form a directory's path.
-     * 
+     *
      * @author Jonathan Tan
      * @typedef {Object} DirectoryInfo
      * @property {string} parent - The parent of the directory.
@@ -16,7 +15,7 @@ export default {
 
     /**
      * The result of processing a directory.
-     * 
+     *
      * @author Jonathan Tan
      * @typedef {Object} ProcessInfo
      * @property {Object[]} toProcess - The directory and its files as objects to be sent to the database.
@@ -28,44 +27,46 @@ export default {
 
     /**
      * Processes a directory and its direct children through a database callback.
-     * 
+     *
      * @author Jonathan Tan
      * @param {DirectoryInfo} dirInfo - The file system object to process.
      * @returns {ProcessInfo} The result of processing the directory.
      */
-    processDirectory(logger, dirInfo) {
+    processDirectory(dirInfo) {
         // list of file system objects to be sent to the database
         let processed = [];
 
         // list of children directories with which to continue indexing
         let continueQ = [];
 
-        // start new profiler for this directory
-        let profiler = new FileMetrics(logger);
+        // initialize counters for file system objects
+        let numFiles = 0;
+        let numDirs = 0;
+        let numUnknown = 0;
 
         // create a representation of the object
-        let ret = FileSystemObject.createFileSystemObject(logger, dirInfo.name);
+        let ret = FileSystemObject.createFileSystemObject(dirInfo.name);
         let fso = ret.fso;
-        profiler.unknownCount += ret.unknown;
+        numUnknown += ret.unknown;
 
         if (fso != null) {
             // for each file in this directory...
             if (!fso.isDirectory) {
                 // should only happen if root was a file; then, do nothing else
-                profiler.filesIndexed++;
+                numFiles++;
             } else if (fso.isSymLink) {
                 // if it's a symbolic link, then count it as a directory, but don't go into it
-                profiler.directoriesIndexed++;
+                numDirs++;
             } else {
                 // it was a directory
-                profiler.directoriesIndexed++;
+                numDirs++;
 
                 // otherwise, for each file in the directory...
                 for (let f of fso.files) {
                     // create the representation of the file
-                    let fileRet = FileSystemObject.createFileSystemObject(logger, f);
+                    let fileRet = FileSystemObject.createFileSystemObject(f);
                     let fileFso = fileRet.fso;
-                    profiler.unknownCount += fileRet.unknown;
+                    numUnknown += fileRet.unknown;
 
                     // add the file to processed list
                     if (fileFso != null) {
@@ -79,7 +80,7 @@ export default {
                         processed.push(fileFsoAsObj);
                     }
                 }
-                profiler.filesIndexed += processed.length;
+                numFiles += processed.length;
 
                 // enqueue all the directories with their parent's name to the return queue
                 for (let subDir of fso.folders) {
@@ -101,9 +102,9 @@ export default {
         return {
             toProcess: processed,
             toContinue: continueQ,
-            filesProcessed: profiler.filesIndexed,
-            dirsProcessed: profiler.directoriesIndexed,
-            unknownSeen: profiler.unknownCount
+            filesProcessed: numFiles,
+            dirsProcessed: numDirs,
+            unknownSeen: numUnknown
         };
     }
 }

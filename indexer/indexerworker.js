@@ -1,81 +1,90 @@
+import amqp from "amqplib/callback_api";
 import args from "./libs/args/argsworker";
 import indexer from "./libs/indexer/indexerutils";
-import fs from "fs";
-import Logger from "./libs/logging/logger";
-import protocol from "./libs/parallel/protocol";
+import readline from "readline";
 
 // get the command-line arguments
-const {verbose} = args;
+const { verbose, rabbitmq, queue_name } = args;
 
 /**
- * Takes a list of directory and sends back to the master the sub-directories and file metadata per directory
- * and profiling metrics after all the directories have been processed.
- * 
+ * Takes a list of directory and sends back to the master the sub-directories and all contained file
+ * metadata, as well as profiling metrics.
+ *
+ * @param {amqp.Channel} channel - The channel between the master process and this worker process.
+ * @param {string} replyQueue - The queue into which to reply.
  * @param {DirectoryInfo[]} dirs - The directories to process.
  */
-function processDirectories(dirs) {
-    let totalFiles = 0;
-    let totalDirs = 0;
-    let totalUnknown = 0;
-
+function processDirectories(channel, replyQueue, dirs) {
     for (let dir of dirs) {
         // process the directory
-        let processed = indexer.processDirectory(logger, dir);
-        logger.debug(`Processed ${dir.name}`);
+        let processed = indexer.processDirectory(dir);
 
-        // accumulate profiler metrics
-        totalFiles += processed.filesProcessed;
-        totalDirs += processed.dirsProcessed;
-        totalUnknown += processed.unknownSeen;
+        // create a reply that contains all the processing information
+        let dirReply = {
+            process: processed.toProcess,
+            profile: { files: processed.filesProcessed, dirs: processed.dirsProcessed, unknown: processed.unknownSeen }
+        };
 
-        // send back file metadata from processed directory
-        outputStream.write(protocol.convertObject({
-            returned: false,
-            process: processed.toProcess
-        }));
-
-        // send the sub-directories to the master for further traversal
+        // also include sub-directories to be traversed, if they exist
         if (processed.toContinue.length != 0) {
-            outputStream.write(protocol.convertObject({
-                returned: false,
-                continue: processed.toContinue
-            }));
+            dirReply.continue = processed.toContinue
         }
+
+        // send back processing data to master
+        channel.sendToQueue(replyQueue, new Buffer(JSON.stringify(dirReply)));
     }
 
-    // inform master that we are done and send the processing metrics
-    outputStream.write(protocol.convertObject({
-        returned: true,
-        profile: { files: totalFiles, dirs: totalDirs, unknown: totalUnknown }
-    }));
+    // notify master that we are done processing
+    channel.sendToQueue(replyQueue, new Buffer("{\"_returned\":true}"));
+
+    // acknowledge the intial message
+    channel.ack(currentMessage);
 }
 
-// create the logger
-const logger = new Logger(verbose).createLogger();
+let currentMessage;
 
-// create input stream on fd[3]
-const inputStream = fs.createReadStream(null, { fd: 3 });
-let inputBuffer = Buffer.allocUnsafe(0);
+// connect to local RabbitMQ server
+amqp.connect(`amqp://${rabbitmq}`, (err, conn) => {
+    if (err) {
+        console.error(err);
+        process.exit(1);
+    }
 
-// create output stream on fd[4]
-const outputStream = fs.createWriteStream(null, { fd: 4 });
+    // create a new protocol channel
+    conn.createConfirmChannel((err, channel) => {
+        // only work with one item at a time
+        channel.prefetch(1);
 
-// upon receiving a list of directories from the master process, process them and send information back to master
-inputStream.on("data", (chunk) => {
-    // add received data to input buffer as string
-    inputBuffer = Buffer.concat([inputBuffer, chunk]);
+        // create a new queue for receiving messages from master
+        channel.assertQueue(queue_name, { durable: false }, (err, ok) => {
+            // retrieve a message from the queue
+            channel.consume(ok.queue, (msg) => {
+                currentMessage = msg;
 
-    // read objects from the buffer while there are some
-    let receivedObject;
-    do {
-        receivedObject = protocol.readObject(inputBuffer);
+                // process the directories sent from master
+                processDirectories(channel, currentMessage.properties.replyTo, JSON.parse(currentMessage.content));
+            });
 
-        if (receivedObject != null) {
-            // process the directory list
-            processDirectories(receivedObject);
+            console.log(queue_name);
+        });
+    });
+});
 
-            // remove processed directory list from buffer
-            inputBuffer = protocol.removeObject(inputBuffer);
-        }
-    } while (receivedObject != null);
+// add a few signal handlers to try and catch early termination
+// in such a case, try to requeue current message so it can re-processed
+if (process.platform === "win32") {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.on("SIGINT", () => {
+        process.emit("SIGINT");
+    });
+}
+process.on("SIGINT", () => {
+    if (channel && currentMessage) {
+        channel.nack(currentMessage);
+        process.exit();
+    }
 });

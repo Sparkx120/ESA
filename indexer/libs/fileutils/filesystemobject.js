@@ -9,7 +9,7 @@ export default class FileSystemObject {
 
     /**
      * Creates an instance of FileSystemObject.
-     * 
+     *
      * @author Jonathan Tan
      * @param {boolean} isDirectory - Whether the object is a directory.
      * @param {boolean} isSymLink - Whether the object is a symbolic link.
@@ -35,7 +35,7 @@ export default class FileSystemObject {
 
     /**
      * A newly created {@link FileSystemObject}.
-     * 
+     *
      * @author Jonathan Tan
      * @typedef {Object} NewFileSystemObject
      * @property {FileSystemObject} fso - The representation of the object.
@@ -44,7 +44,7 @@ export default class FileSystemObject {
 
     /**
      * Returns a representation of a a file system object given its path.
-     * 
+     *
      * @author Jonathan Tan
      * @param {string} filename - The file name of the object.
      * @returns {NewFileSystemObject} The representation of the object.
@@ -52,14 +52,13 @@ export default class FileSystemObject {
 
     /**
      * Returns a representation of a a file system object given its path.
-     * 
+     *
      * @author Jonathan Tan
      * @static
-     * @param {bunyan.Logger} - The logger object for logging.
      * @param {string} filename - The file name of the object.
      * @returns {NewFileSystemObject} The representation of the object.
      */
-    static createFileSystemObject(logger, filename) {
+    static createFileSystemObject(filename) {
         // children files and directories that were unable to be read
         let unknown = 0;
 
@@ -92,12 +91,12 @@ export default class FileSystemObject {
                             }
                         } catch (err) {
                             unknown++;
-                            logger.error(err);
+                            console.log(err.message);
                         }
                     }
                 } catch (err) {
                     unknown++;
-                    logger.error(err);
+                    console.log(err.message);
                 }
 
                 return { fso, unknown };
@@ -110,14 +109,14 @@ export default class FileSystemObject {
             }
         } catch (err) {
             unknown++;
-            logger.error(err);
+            console.log(err.message);
             return { fso: null, unknown };
         }
     }
 
     /**
      * An object representation of a {@link FileSystemObject}.
-     * 
+     *
      * @typedef {Object} FileSystemObjectAsObject
      * @property {string} _id - The file name of the object.
      * @property {boolean} isDirectory - Whether the object is a directory.
@@ -133,7 +132,7 @@ export default class FileSystemObject {
 
     /**
      * Returns the file system object as a convenient JavaScript object.
-     * 
+     *
      * @author Jonathan Tan
      * @returns {FileSystemObjectAsObject} The JS object representation of the {@link FileSystemObject}.
      */
@@ -154,7 +153,7 @@ export default class FileSystemObject {
 
     /**
      * Adds a file name to the object's files array.
-     * 
+     *
      * @author Jonathan Tan
      * @param {string} filename - The file name to add.
      */
@@ -164,7 +163,7 @@ export default class FileSystemObject {
 
     /**
      * Adds a folder path to the object's folders array.
-     * 
+     *
      * @author Jonathan Tan
      * @param {string} dirpath - The directory path to add.
      */

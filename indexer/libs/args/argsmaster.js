@@ -5,11 +5,15 @@ import yargs from "yargs";
 
 export default yargs.usage("Usage: $0 [options]")
     // root directory
-    .alias("r", "root")
+    .alias("r", "root_dir")
     .nargs("r", 1)
     .describe("r", "Root directory")
     .normalize("r")
-    .demandOption("root")
+
+    // continue key
+    .alias("c", "contd")
+    .nargs("c", 1)
+    .describe("c", "Resume key")
 
     // database server hostname
     .alias("s", "server")
@@ -22,8 +26,13 @@ export default yargs.usage("Usage: $0 [options]")
     .default("p", 27017)
     .describe("p", "Port number")
 
+    // RabbitMQ server
+    .alias("q", "rabbitmq")
+    .nargs("q", 1)
+    .describe("q", "RabbitMQ hostname")
+
     // buffer threshold
-    .alias("b", "buffer")
+    .alias("b", "buffer_threshold")
     .nargs("b", 1)
     .default("b", 2048)
     .describe("b", "Buffer threshold")
@@ -47,26 +56,32 @@ export default yargs.usage("Usage: $0 [options]")
         let config = yaml.load(configPath);
 
         return {
-            root: config.indexer.root,
+            root_dir: config.indexer.root,
+            contd: config.indexer.resume,
             server: config.database.server,
             port: config.database.port,
-            buffer: config.database.buffer,
+            rabbitmq: config.database.rabbitmq,
+            buffer_threshold: config.database.buffer,
             debug: config.database.debug_override,
             verbose: config.verbose
         };
     })
 
-    // provide a couple example of how to use arguments
-    .example("$0 --root C: -s localhost -p 27017", "Index C: drive and output to the server on localhost:27017")
-    .example("$0 --root C: --debug out.json", "Index C: drive and output to JSON file debug.json")
-    .example("$0 --config config.yaml", "Index according to configuration in YAML file config.yaml")
+    // provide a few examples of how to use arguments
+    .example("$0 --root_dir C: -s localhost -p 27017 -q localhost", "Index C: drive and output to the server on mongodb://localhost:27017")
+    .example("$0 --root_dir C: -q localhost --debug out.json", "Index C: drive and output to JSON file out.json")
+    .example("$0 --contd 0a1b2c3d4e5f6789abc", "Resume indexer execution identified by given key")
+    .example("$0 --config config.yaml", "Setup and start indexer according to configuration in YAML file config.yaml")
 
     // specify data types of options
     .boolean("verbose")
-    .number(["port", "buffer"])
-    .string(["root", "server", "config", "debug"])
+    .number(["port", "buffer_threshold"])
+    .string(["root_dir", "contd", "server", "rabbitmq", "config", "debug"])
 
-    // ensure that either the server hostname or the debug file has been specified
-    .check((argv, aliases) => { return !(argv.server === undefined && argv.debug === undefined); })
+    // ensure that either the server hostname or the debug file has been specified unless the continue option is present
+    .check((argv, aliases) => { return !(argv.server === undefined && argv.debug === undefined && argv.contd === undefined); })
+
+    // ensure that a root and rabbitmq server has been specified unless the continue option is present
+    .check((argv, aliases) => { return !((argv.root_dir === undefined || argv.rabbitmq === undefined) && argv.contd === undefined); })
 
     .argv;

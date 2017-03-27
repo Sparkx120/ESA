@@ -1,15 +1,20 @@
 default:
-    indexer:
-# Root directory from which to index
-        root: "C:"
     database:
-# Server hostname of the database
-        server: localhost
-# Port number of the database (default: 27017)
-        port: 27017
 # Buffer threshold for database write operations list (default: 2048)
         buffer: 2048
-# Leave as blank, unless you want to dump to the specified JSON file instead of to database
-        debug_override: ""
+# Comment out, unless you want to dump to the specified JSON file instead of to database
+#       debug_override:
+# Port number of the database (default: 27017)
+        port: 27017
+# Server hostname of the database
+        server: localhost
+# Hostname of the RabbitMQ server
+        rabbitmq: localhost
+    indexer:
+# Comment out, unless you want to resume using a continue key
+#       resume:
+# Root directory from which to index
+        root: "C:/"
 # Verbose logging output
     verbose: false
+
